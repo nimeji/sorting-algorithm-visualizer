@@ -1,24 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import { Sorter } from './components/Sorter/Sorter';
+
+function shuffleFisherYates(array: Array<number>) {
+  let i = array.length;
+  while (i--) {
+    const ri = Math.floor(Math.random() * i);
+    [array[i], array[ri]] = [array[ri], array[i]];
+  }
+
+  return array;
+}
 
 function App() {
+  const [data, setData] = useState<Array<number>>([]);
+
+  useEffect(() => {
+    const temp = [];
+    
+    for(let i=0; i<10; i++) {
+      temp[i] = 1/10 * (i+1);
+    }
+    shuffleFisherYates(temp);
+    setData(temp);
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Sorter data={data} />
     </div>
   );
 }
