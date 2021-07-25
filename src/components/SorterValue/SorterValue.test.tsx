@@ -21,4 +21,10 @@ describe('SorterValue', () => {
     wrapper.setProps({selected: true});
     expect(wrapper.hasClass('Selected')).toBeTruthy();
   });
+
+  it('has the Sorted class if sorted', () => {
+    expect(wrapper.hasClass('Sorted')).toBeFalsy();
+    wrapper.setProps({sorted: true});
+    expect(wrapper.hasClass('Sorted')).toBeTruthy();
+  });
 });
