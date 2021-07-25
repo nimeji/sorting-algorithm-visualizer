@@ -1,13 +1,12 @@
-import { shallow, ShallowWrapper } from 'enzyme';
+import { mount, ReactWrapper } from 'enzyme';
 import { SorterValue } from '../SorterValue/SorterValue';
 import { Sorter, SorterProps } from './Sorter';
 
 describe('Sorter', () => {
-  //let wrapper: ShallowWrapper<{}, {}, React.Component<{}, {}, any>>;
-  let wrapper: ShallowWrapper<typeof Sorter, SorterProps, {}>
+  let wrapper: ReactWrapper<typeof Sorter, SorterProps, {}>
   beforeEach(() => {
     const data = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
-    wrapper = shallow(<Sorter data={data} />)
+    wrapper = mount(<Sorter data={data} />)
   });
 
   it('has correct number of SorterValues', () => {

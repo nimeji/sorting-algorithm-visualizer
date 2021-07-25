@@ -14,5 +14,11 @@ describe('SorterValue', () => {
 
   it('has correct width', () => {
     expect(wrapper.find('div').prop('style')).toHaveProperty('width', '66%');
-  })
+  });
+
+  it('has the Selected class if selected', () => {
+    expect(wrapper.hasClass('Selected')).toBeFalsy();
+    wrapper.setProps({selected: true});
+    expect(wrapper.hasClass('Selected')).toBeTruthy();
+  });
 });

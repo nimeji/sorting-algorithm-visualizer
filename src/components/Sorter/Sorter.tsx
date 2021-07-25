@@ -1,24 +1,36 @@
 import styles from './Sorter.module.scss';
 
 import { SorterValue } from "../SorterValue/SorterValue";
+import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 export type SorterProps = {
   data: Array<number>;
 }
 
-function* bubbleSort(data: Array<number>) {
-  for(let i = 0; i < data.length - 1; i++) {
+function cloneArray(array: Array<any>) {
+  const result = [];
+  let i = array.length;
+  while(i--) {
+    result[i] = array[i];
+  }
+
+  return result;
+}
+
+function* bubbleSort(array: Array<number>, swap: (i: number, j: number) => void) {
+  console.log(array, swap);
+  for(let i = 0; i < array.length - 1; i++) {
     let swapped = false;
-    for(let j = 0; j < data.length - 1 - i; j++) {
-      if(data[j] > data[j+1]) {
-        let temp = data[j];
-        data[j] = data[j+1];
-        data[j+1] = temp;
+    for(let j = 0; j < array.length - 1 - i; j++) {
+      console.log(i, j, array[j], array[j+1], array.length);
+      if(array[j] > array[j+1]) {
+        swap(j, j+1);
 
         swapped = true;
-        
-        yield [j, j+1];
+        console.log('swap', array);
       }
+      [array, swap] = yield [j, j+1];
     }
     if(!swapped) break;
   }
@@ -28,17 +40,41 @@ function* bubbleSort(data: Array<number>) {
 
 export function Sorter({data}: SorterProps) {
 
-  const values = [];
-  for(let i = 0; i < data.length; i++) {
-    values[i] = <SorterValue key={i} height={data[i] * 100} width={100/data.length} />
+  const [values, setValues] = useState<Array<number>>([]);
+  const [generator, setGenerator] = useState<Generator>();
+  const [compared, setCompared] = useState<[number, number]>([-1, -1]);
+
+  const swap = useCallback((i: number, j: number) => {
+    const temp = cloneArray(values);
+
+    [temp[i], temp[j]] = [temp[j], temp[i]];
+
+    setValues(temp);
+  }, [values]);
+
+  useEffect(() => {
+    setValues(cloneArray(data));
+    setGenerator(undefined);
+  }, [data]);
+
+  useEffect(() => {
+    if(values.length > 0 && !generator)
+      setGenerator(bubbleSort(values, swap));
+  }, [values, generator, swap]);
+
+  const elements = [];
+  for(let i = 0; i < values.length; i++) {
+    elements[i] = <SorterValue key={i} height={values[i] * 100} width={100/values.length} />
   }
 
   return (
     <div>
       <div className={styles.Container}>
-        {values}
+        {elements}
       </div>
-      <button onClick={()=>bubbleSort(data)}>Continue</button>
+      <button onClick={()=>{
+        if(generator) generator.next([values, swap]);
+      }}>Continue</button>
     </div>
   );
 }
