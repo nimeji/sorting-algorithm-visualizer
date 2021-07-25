@@ -19,7 +19,6 @@ function cloneArray(array: Array<any>) {
 }
 
 function* bubbleSort(array: Array<number>, swap: (i: number, j: number) => void) {
-  console.log(array, swap);
   for(let i = 0; i < array.length - 1; i++) {
     let swapped = false;
     for(let j = 0; j < array.length - 1 - i; j++) {
@@ -28,7 +27,6 @@ function* bubbleSort(array: Array<number>, swap: (i: number, j: number) => void)
         swap(j, j+1);
 
         swapped = true;
-        console.log('swap', array);
       }
     }
     if(!swapped) break;
@@ -42,6 +40,7 @@ export function Sorter({data}: SorterProps) {
   const [values, setValues] = useState<Array<number>>([]);
   const [generator, setGenerator] = useState<Generator>();
   const [compared, setCompared] = useState<[number | undefined, number | undefined]>([undefined, undefined]);
+  const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
 
   const swap = useCallback((i: number, j: number) => {
     const temp = cloneArray(values);
@@ -76,9 +75,21 @@ export function Sorter({data}: SorterProps) {
       <div className={styles.Container}>
         {elements}
       </div>
-      <button onClick={()=>{
-        if(generator) setCompared(generator.next([values, swap]).value);
-      }}>Continue</button>
+      <button 
+        onClick={()=>{
+          if(generator) {
+            const result = generator.next([values, swap]).value;
+
+            if(result){
+              setCompared(result);
+            } else {
+              setCompared([undefined, undefined]);
+              setButtonDisabled(true);
+            }
+          };
+        }}
+        disabled={buttonDisabled}
+      >Continue</button>
     </div>
   );
 }
