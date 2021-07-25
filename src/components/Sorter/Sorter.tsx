@@ -6,7 +6,7 @@ import { useCallback } from 'react';
 
 export type SorterProps = {
   data: number[];
-  timeDecimals?: number;
+  decimals?: number;
 }
 
 function cloneArray(array: Array<any>) {
@@ -44,7 +44,7 @@ function* bubbleSort(array: number[], swap: (i: number, j: number) => void) {
   return;
 }
 
-export function Sorter({data, timeDecimals=1}: SorterProps) {
+export function Sorter({data, decimals=1}: SorterProps) {
 
   const [values, setValues] = useState<Array<number>>([]);
   const [generator, setGenerator] = useState<Generator>();
@@ -89,8 +89,8 @@ export function Sorter({data, timeDecimals=1}: SorterProps) {
   const runNext = () => {
     if(generator) {
       const sleep = performance.now() - performanceTimer - realTime
-      setSleepTime(sleep);
       const result = generator.next([values, swap]).value;
+      setSleepTime(sleep);
       setRealTime(performance.now() - performanceTimer - sleep);
 
 
@@ -116,8 +116,8 @@ export function Sorter({data, timeDecimals=1}: SorterProps) {
       <div className={styles.Metrics}>
         <div id="comparisions">Comparisons: <span>{comparisions}</span></div>
         <div id="accesses">Array Accesses: <span>{arrayAccesses}</span></div>
-        <div id="real-time">Real Time: <span>{realTime.toFixed(timeDecimals)}</span>ms</div>
-        <div id="sleep-time">Sleep Time: <span>{sleepTime.toFixed(timeDecimals)}</span>ms</div>
+        <div id="real-time">Real Time: <span>{realTime.toFixed(decimals)}</span>ms</div>
+        <div id="sleep-time">Sleep Time: <span>{sleepTime.toFixed(decimals)}</span>ms</div>
       </div>
 
       <button 
