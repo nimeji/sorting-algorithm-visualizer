@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useCallback } from 'react';
 
 export type SorterProps = {
-  data: Array<number>;
+  data: number[];
 }
 
 function cloneArray(array: Array<any>) {
@@ -18,19 +18,21 @@ function cloneArray(array: Array<any>) {
   return result;
 }
 
-function* bubbleSort(array: Array<number>, swap: (i: number, j: number) => void) {
+function* bubbleSort(array: number[], swap: (i: number, j: number) => void) {
+  let sorted: number[] = [];
+
   for(let i = 0; i < array.length - 1; i++) {
-    let swapped = false;
-    for(let j = 0; j < array.length - 1 - i; j++) {
-      [array, swap] = yield [j, j+1];
+    let j;
+    for(j = 0; j < array.length - 1 - i; j++) {
+      [array, swap] = yield [j, j+1, sorted];
       if(array[j] > array[j+1]) {
         swap(j, j+1);
-
-        swapped = true;
       }
     }
-    if(!swapped) break;
+    sorted = [j, ...sorted];
   }
+  sorted = [0, ...sorted];
+  yield [undefined, undefined, sorted];
 
   return;
 }
@@ -40,6 +42,7 @@ export function Sorter({data}: SorterProps) {
   const [values, setValues] = useState<Array<number>>([]);
   const [generator, setGenerator] = useState<Generator>();
   const [compared, setCompared] = useState<[number | undefined, number | undefined]>([undefined, undefined]);
+  const [sorted, setSorted] = useState<number[]>([]);
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
 
   const swap = useCallback((i: number, j: number) => {
@@ -66,7 +69,8 @@ export function Sorter({data}: SorterProps) {
       key={i} 
       height={values[i] * 100} 
       width={100/values.length} 
-      selected={(compared[0] === i || compared[1] === i)}
+      selected={compared.includes(i)}
+      sorted={sorted.includes(i)}
     />
   }
 
@@ -81,7 +85,9 @@ export function Sorter({data}: SorterProps) {
             const result = generator.next([values, swap]).value;
 
             if(result){
-              setCompared(result);
+              const [i, j, sorted] = result;
+              setCompared([i, j]);
+              setSorted(sorted);
             } else {
               setCompared([undefined, undefined]);
               setButtonDisabled(true);

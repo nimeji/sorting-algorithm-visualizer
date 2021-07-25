@@ -31,11 +31,10 @@ describe('Sorter', () => {
   });
 
   it('disables the button when sorting is done', ()=>{
-
     for(let i = 0; i < 10000; i++) {
       wrapper.find('button').simulate('click');
     }
-    expect(wrapper.find('button').prop('disabled')).toBe(true);
+    expect(wrapper.find('button').prop('disabled')).toBeTruthy();
   });
 
   it('results in a sorted list', () => {
@@ -48,4 +47,15 @@ describe('Sorter', () => {
       expect(values.at(i).prop('height')).toBeLessThanOrEqual(values.at(i+1).prop('height'))
     }    
   });
+
+  it('marks the list as sorted', () => {
+    while(wrapper.find('button').prop('disabled') === false) {
+      wrapper.find('button').simulate('click');
+    }
+
+    const values = wrapper.find(SorterValue);
+    for(let i=0; i < values.length; i++) {
+      expect(values.at(i).prop('sorted')).toBeTruthy();
+    }    
+  })
 });
