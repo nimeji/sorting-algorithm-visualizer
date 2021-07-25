@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 
 export type SorterProps = {
   data: number[];
+  timeDecimals?: number;
 }
 
 function cloneArray(array: Array<any>) {
@@ -20,30 +21,41 @@ function cloneArray(array: Array<any>) {
 
 function* bubbleSort(array: number[], swap: (i: number, j: number) => void) {
   let sorted: number[] = [];
+  let comparisions = 0;
+  let accesses = 0;
 
   for(let i = 0; i < array.length - 1; i++) {
     let j;
     for(j = 0; j < array.length - 1 - i; j++) {
-      [array, swap] = yield [j, j+1, sorted];
+      comparisions += 1;
+      accesses += 2;
+      [array, swap] = yield [j, j+1, sorted, comparisions, accesses];
+
       if(array[j] > array[j+1]) {
+        accesses += 4;
         swap(j, j+1);
       }
     }
     sorted = [j, ...sorted];
   }
   sorted = [0, ...sorted];
-  yield [undefined, undefined, sorted];
+  yield [undefined, undefined, sorted, comparisions, accesses];
 
   return;
 }
 
-export function Sorter({data}: SorterProps) {
+export function Sorter({data, timeDecimals=1}: SorterProps) {
 
   const [values, setValues] = useState<Array<number>>([]);
   const [generator, setGenerator] = useState<Generator>();
   const [compared, setCompared] = useState<[number | undefined, number | undefined]>([undefined, undefined]);
   const [sorted, setSorted] = useState<number[]>([]);
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
+  const [performanceTimer, setPerformanceTimer] = useState<number>(performance.now());
+  const [realTime, setRealTime] = useState(0);
+  const [sleepTime, setSleepTime] = useState(0);
+  const [comparisions, setComparisions] = useState(0);
+  const [arrayAccesses, setArrayAccesses] = useState(0);
 
   const swap = useCallback((i: number, j: number) => {
     const temp = cloneArray(values);
@@ -74,26 +86,42 @@ export function Sorter({data}: SorterProps) {
     />
   }
 
+  const runNext = () => {
+    if(generator) {
+      const sleep = performance.now() - performanceTimer - realTime
+      setSleepTime(sleep);
+      const result = generator.next([values, swap]).value;
+      setRealTime(performance.now() - performanceTimer - sleep);
+
+
+      if(result){
+        const [i, j, sorted, comp, acc] = result;
+
+        setCompared([i, j]);
+        setSorted(sorted);
+        setComparisions(comp);
+        setArrayAccesses(acc);
+      } else {
+        setCompared([undefined, undefined]);
+        setButtonDisabled(true);
+      }
+    };
+  }
+
   return (
-    <div>
-      <div className={styles.Container}>
+    <div className={styles.Container}>
+      <div className={styles.ValueContainer}>
         {elements}
       </div>
-      <button 
-        onClick={()=>{
-          if(generator) {
-            const result = generator.next([values, swap]).value;
+      <div className={styles.Metrics}>
+        <div id="comparisions">Comparisons: <span>{comparisions}</span></div>
+        <div id="accesses">Array Accesses: <span>{arrayAccesses}</span></div>
+        <div id="real-time">Real Time: <span>{realTime.toFixed(timeDecimals)}</span>ms</div>
+        <div id="sleep-time">Sleep Time: <span>{sleepTime.toFixed(timeDecimals)}</span>ms</div>
+      </div>
 
-            if(result){
-              const [i, j, sorted] = result;
-              setCompared([i, j]);
-              setSorted(sorted);
-            } else {
-              setCompared([undefined, undefined]);
-              setButtonDisabled(true);
-            }
-          };
-        }}
+      <button 
+        onClick={runNext}
         disabled={buttonDisabled}
       >Continue</button>
     </div>
