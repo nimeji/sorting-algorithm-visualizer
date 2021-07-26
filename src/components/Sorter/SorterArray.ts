@@ -1,4 +1,14 @@
 
+function cloneArray(array: Array<any>) {
+  const result = [];
+  let i = array.length;
+  while(i--) {
+    result[i] = array[i];
+  }
+
+  return result;
+}
+
 export class SorterArray {
   private array: number[];
   private compareFn: (a: number, b: number) => boolean;
@@ -6,7 +16,7 @@ export class SorterArray {
   public comparisons: number = 0;
 
   constructor(array: number[], compareFn: (a: number, b: number) => boolean) {
-    this.array = array;
+    this.array = cloneArray(array);
     this.compareFn = compareFn;
   }
 

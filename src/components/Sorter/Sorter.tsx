@@ -19,16 +19,6 @@ type SorterState = {
   sorted: number[];
 }
 
-function cloneArray(array: Array<any>) {
-  const result = [];
-  let i = array.length;
-  while(i--) {
-    result[i] = array[i];
-  }
-
-  return result;
-}
-
 function* bubbleSort(array: SorterArray) {
   let sorted: number[] = [];
   const length = array.length;
@@ -91,7 +81,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
         generator: undefined,
       });
 
-      this.values = new SorterArray(cloneArray(this.props.data), Sorter.compareFn);
+      this.values = new SorterArray(this.props.data, Sorter.compareFn);
     }
 
     if (this.values.length > 0 && !this.state.generator) {
