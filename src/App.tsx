@@ -16,9 +16,9 @@ function App() {
 
   useEffect(() => {
     const temp = [];
-    
-    for(let i=0; i<10; i++) {
-      temp[i] = 1/10 * (i+1);
+    const len = 100;
+    for(let i=0; i<len; i++) {
+      temp[i] = 1/len * (i+1);
     }
     shuffleFisherYates(temp);
     setData(temp);
@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div>
-      <Sorter data={data} />
+      <Sorter data={data} delay={0}/>
     </div>
   );
 }
