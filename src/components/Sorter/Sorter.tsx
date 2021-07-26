@@ -1,12 +1,24 @@
 import styles from './Sorter.module.scss';
 
 import { SorterValue } from "../SorterValue/SorterValue";
-import { useEffect, useState } from 'react';
-import { useCallback } from 'react';
+import { Component } from 'react';
 
 export type SorterProps = {
   data: number[];
   decimals?: number;
+}
+
+type SorterState = {
+  arrayAccesses: number;
+  buttonDisabled: boolean;
+  compared: [number | undefined, number | undefined];
+  comparisons: number;
+  generator: Generator | undefined;
+  performanceTimer: number;
+  realTime: number;
+  sleepTime: number;
+  sorted: number[];
+  values: number[];
 }
 
 function cloneArray(array: Array<any>) {
@@ -44,86 +56,135 @@ function* bubbleSort(array: number[], swap: (i: number, j: number) => void) {
   return;
 }
 
-export function Sorter({data, decimals=1}: SorterProps) {
+export class Sorter extends Component<SorterProps, SorterState> {
+  constructor(props: SorterProps) {
+    super(props);
 
-  const [values, setValues] = useState<Array<number>>([]);
-  const [generator, setGenerator] = useState<Generator>();
-  const [compared, setCompared] = useState<[number | undefined, number | undefined]>([undefined, undefined]);
-  const [sorted, setSorted] = useState<number[]>([]);
-  const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
-  const [performanceTimer, setPerformanceTimer] = useState<number>(performance.now());
-  const [realTime, setRealTime] = useState(0);
-  const [sleepTime, setSleepTime] = useState(0);
-  const [comparisions, setComparisions] = useState(0);
-  const [arrayAccesses, setArrayAccesses] = useState(0);
+    this.state = {
+      arrayAccesses: 0,
+      buttonDisabled: false,
+      compared: [undefined, undefined],
+      comparisons: 0,
+      generator: undefined,
+      performanceTimer: performance.now(),
+      realTime: 0,
+      sleepTime: 0,
+      sorted: [],
+      values: [],
+    };
 
-  const swap = useCallback((i: number, j: number) => {
-    const temp = cloneArray(values);
-
-    [temp[i], temp[j]] = [temp[j], temp[i]];
-
-    setValues(temp);
-  }, [values]);
-
-  useEffect(() => {
-    setValues(cloneArray(data));
-    setGenerator(undefined);
-  }, [data]);
-
-  useEffect(() => {
-    if(values.length > 0 && !generator)
-      setGenerator(bubbleSort(values, swap));
-  }, [values, generator, swap]);
-
-  const elements = [];
-  for(let i = 0; i < values.length; i++) {
-    elements[i] = <SorterValue 
-      key={i} 
-      height={values[i] * 100} 
-      width={100/values.length} 
-      selected={compared.includes(i)}
-      sorted={sorted.includes(i)}
-    />
+    this.swap = this.swap.bind(this);
+    this.runNext = this.runNext.bind(this);
   }
 
-  const runNext = () => {
+  componentDidMount() {
+    this.setState({values: cloneArray(this.props.data)});
+  }
+
+  componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
+    if (prevProps.data !== this.props.data) {
+      this.setState({
+        values: cloneArray(this.props.data),
+        generator: undefined,
+      });
+    }
+
+    if (prevState.values !== this.state.values && this.state.values.length > 0 && !this.state.generator) {
+      this.setState({
+        generator: bubbleSort(this.state.values, this.swap),
+      });
+      console.log(this.state.values);
+    }
+  }
+
+  swap(i: number, j: number) {
+    this.setState((prevState) => {
+      const temp = cloneArray(prevState.values);
+
+      [temp[i], temp[j]] = [temp[j], temp[i]];
+
+      return {values: temp}
+    })
+  }
+
+  runNext() {
+    const {
+      generator,
+      performanceTimer,
+      realTime,
+      values
+    } = this.state;
+
     if(generator) {
       const sleep = performance.now() - performanceTimer - realTime
-      const result = generator.next([values, swap]).value;
-      setSleepTime(sleep);
-      setRealTime(performance.now() - performanceTimer - sleep);
+      const result = generator.next([values, this.swap]).value;
 
+      this.setState({
+        sleepTime: sleep,
+        realTime: performance.now() - performanceTimer - sleep,
+      });
 
       if(result){
         const [i, j, sorted, comp, acc] = result;
 
-        setCompared([i, j]);
-        setSorted(sorted);
-        setComparisions(comp);
-        setArrayAccesses(acc);
+        this.setState({
+          compared: [i, j],
+          sorted: sorted,
+          comparisons: comp,
+          arrayAccesses: acc,
+        });
+
       } else {
-        setCompared([undefined, undefined]);
-        setButtonDisabled(true);
+        this.setState({
+          compared: [undefined, undefined],
+          buttonDisabled: true,
+        });
       }
-    };
+    }
   }
 
-  return (
-    <div className={styles.Container}>
-      <div className={styles.ValueContainer}>
-        {elements}
-      </div>
-      <div className={styles.Metrics}>
-        <div id="comparisions">Comparisons: <span>{comparisions}</span></div>
-        <div id="accesses">Array Accesses: <span>{arrayAccesses}</span></div>
-        <div id="real-time">Real Time: <span>{realTime.toFixed(decimals)}</span>ms</div>
-        <div id="sleep-time">Sleep Time: <span>{sleepTime.toFixed(decimals)}</span>ms</div>
-      </div>
+  render() {
+    const { 
+      comparisons, 
+      arrayAccesses, 
+      realTime, 
+      sleepTime, 
+      buttonDisabled, 
+      sorted, 
+      values, 
+      compared 
+    } = this.state;
 
-      <button 
-        onClick={runNext}
-        disabled={buttonDisabled}
-      >Continue</button>
-    </div>
-  );
+    const { decimals } = this.props;
+
+    const elements = [];
+    for(let i = 0; i < values.length; i++) {
+      elements[i] = <SorterValue 
+        key={i} 
+        height={values[i] * 100} 
+        width={100/values.length} 
+        selected={compared.includes(i)}
+        sorted={sorted.includes(i)}
+      />
+    }
+
+    return (
+      <div className={styles.Container}>
+        <div className={styles.ValueContainer}>
+          {elements}
+        </div>
+        <div className={styles.Metrics}>
+          <div id="comparisions">Comparisons: <span>{comparisons}</span></div>
+          <div id="accesses">Array Accesses: <span>{arrayAccesses}</span></div>
+          <div id="real-time">Real Time: <span>{realTime.toFixed(decimals)}</span>ms</div>
+          <div id="sleep-time">Sleep Time: <span>{sleepTime.toFixed(decimals)}</span>ms</div>
+        </div>
+
+        <button 
+          onClick={this.runNext}
+          disabled={buttonDisabled}
+        >Continue</button>
+      </div>
+    );
+  }
 }

@@ -31,7 +31,7 @@ describe('Sorter initial', () => {
   });
 
   it('disables the button when sorting is done', ()=>{
-    for(let i = 0; i < 10000; i++) {
+    for(let i = 0; i < 100; i++) {
       wrapper.find('button').simulate('click');
     }
     expect(wrapper.find('button').prop('disabled')).toBeTruthy();
@@ -47,13 +47,15 @@ describe('Sorter after sorting', () => {
     const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
     wrapper = mount(<Sorter data={data} />);
 
-    while(wrapper.find('button').prop('disabled') === false) {
+    let i = 100;
+    while(wrapper.find('button').prop('disabled') === false && i--) {
       wrapper.find('button').simulate('click');
     }
   });
 
   it('results in a sorted list', () => {
     const values = wrapper.find(SorterValue);
+
     for(let i=0; i < values.length - 1; i++) {
       expect(values.at(i).prop('height')).toBeLessThanOrEqual(values.at(i+1).prop('height'))
     }    
