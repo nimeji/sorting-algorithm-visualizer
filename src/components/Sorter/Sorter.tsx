@@ -31,32 +31,31 @@ function cloneArray(array: Array<any>) {
   return result;
 }
 
-function* bubbleSort(array: number[], swap: (i: number, j: number) => void) {
+function* bubbleSort(length: number, compare: (i: number, j: number) => boolean, swap: (i: number, j: number) => void) {
   let sorted: number[] = [];
-  let comparisions = 0;
-  let accesses = 0;
 
-  for(let i = 0; i < array.length - 1; i++) {
+  for(let i = 0; i < length - 1; i++) {
     let j;
-    for(j = 0; j < array.length - 1 - i; j++) {
-      comparisions += 1;
-      accesses += 2;
-      [array, swap] = yield [j, j+1, sorted, comparisions, accesses];
+    for(j = 0; j < length - 1 - i; j++) {
+      yield [j, j+1, sorted];
 
-      if(array[j] > array[j+1]) {
-        accesses += 4;
+      if(compare(j, j+1)) {
         swap(j, j+1);
       }
     }
     sorted = [j, ...sorted];
   }
   sorted = [0, ...sorted];
-  yield [undefined, undefined, sorted, comparisions, accesses];
+  yield [undefined, undefined, sorted];
 
   return;
 }
 
 export class Sorter extends Component<SorterProps, SorterState> {
+  static defaultProps = {
+    decimals: 1,
+  }
+
   constructor(props: SorterProps) {
     super(props);
 
@@ -73,6 +72,9 @@ export class Sorter extends Component<SorterProps, SorterState> {
       values: [],
     };
 
+    this.set = this.set.bind(this);
+    this.get = this.get.bind(this);
+    this.compare = this.compare.bind(this);
     this.swap = this.swap.bind(this);
     this.runNext = this.runNext.bind(this);
   }
@@ -91,20 +93,52 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
     if (prevState.values !== this.state.values && this.state.values.length > 0 && !this.state.generator) {
       this.setState({
-        generator: bubbleSort(this.state.values, this.swap),
+        generator: bubbleSort(this.state.values.length, this.compare, this.swap),
       });
-      console.log(this.state.values);
     }
   }
 
-  swap(i: number, j: number) {
+  set(i: number, v: number) {
     this.setState((prevState) => {
       const temp = cloneArray(prevState.values);
+      
+      temp[i] = v;
 
-      [temp[i], temp[j]] = [temp[j], temp[i]];
+      return {
+        values: temp,
+        arrayAccesses: prevState.arrayAccesses + 1,
+      }
+    });
+  }
 
-      return {values: temp}
-    })
+  get(i: number) {
+    this.setState((prevState) => {
+      return {
+        arrayAccesses: prevState.arrayAccesses + 1,
+      }
+    });
+
+    return this.state.values[i];
+  }
+
+  compare(i: number, j: number) {
+    const result = this.get(i) > this.get(j);
+
+    this.setState((prevState) => {
+      return {
+        comparisons: prevState.comparisons + 1,
+      }
+    });
+
+    return result;
+  }
+
+  swap(i: number, j: number) {
+    const a = this.get(i);
+    const b = this.get(j);
+
+    this.set(i, b);
+    this.set(j, a);
   }
 
   runNext() {
@@ -125,13 +159,11 @@ export class Sorter extends Component<SorterProps, SorterState> {
       });
 
       if(result){
-        const [i, j, sorted, comp, acc] = result;
+        const [i, j, sorted] = result;
 
         this.setState({
           compared: [i, j],
           sorted: sorted,
-          comparisons: comp,
-          arrayAccesses: acc,
         });
 
       } else {
