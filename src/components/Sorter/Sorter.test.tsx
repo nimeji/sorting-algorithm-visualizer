@@ -45,7 +45,7 @@ describe('Sorter after sorting', () => {
 
   beforeAll(() => {
     const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
-    wrapper = mount(<Sorter data={data} />);
+    wrapper = mount(<Sorter data={data} delay={0} />);
 
     let i = 100;
     while(wrapper.find('button').prop('disabled') === false && i--) {

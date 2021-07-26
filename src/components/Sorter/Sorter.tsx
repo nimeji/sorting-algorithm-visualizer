@@ -7,13 +7,12 @@ import { SorterArray } from './SorterArray';
 export type SorterProps = {
   data: number[];
   decimals?: number;
-  delay?: number;
-  updateInterval?: number;
+  delay: number;
+  updateInterval: number;
 }
 
 type SorterState = {
   buttonDisabled: boolean;
-  compared: [number | undefined, number | undefined];
   generator: Generator | undefined;
   performanceTimer: number;
   sorted: number[];
@@ -47,22 +46,23 @@ export class Sorter extends Component<SorterProps, SorterState> {
     updateInterval: 1000/24,
   }
   static compareFn = (i: number, j: number) => i > j;
+  static minDelay = 10;
+  static minUpdateInterval = 10;
 
-  private arrayAccesses: number = 0;
   private compared: [number | undefined, number | undefined] = [undefined, undefined];
-  private comparisons: number = 0;
   private realTime: number = 0;
   private sleepTime: number = 0;
   private sorted: number[] = [];
   private values: SorterArray = new SorterArray([], () => true);
   private needUpdate: boolean = false;
+  private currentStep: number = 0;
+
 
   constructor(props: SorterProps) {
     super(props);
 
     this.state = {
       buttonDisabled: false,
-      compared: [undefined, undefined],
       generator: undefined,
       performanceTimer: performance.now(),
       sorted: [],
@@ -128,18 +128,28 @@ export class Sorter extends Component<SorterProps, SorterState> {
     });
 
     const timer = setInterval(() => {
-      if(!this.runNext()) {
-        clearTimeout(timer)
+      let hasNext;
+
+      do {
+        hasNext = this.runNext();
+        this.currentStep = this.currentStep + 1;
+        
+      } while(this.sleepTime > this.props.delay * this.currentStep && hasNext)
+
+      if(!hasNext) {
+        clearTimeout(timer);
+        this.forceUpdate()
+        this.needUpdate = false;
       } else {
         this.needUpdate = true;
       }
-    }, this.props.delay);
+    }, Math.max(this.props.delay, Sorter.minDelay));
     setInterval(() => {
       if(this.needUpdate) {
         this.forceUpdate();
         this.needUpdate = false;
       }
-    }, this.props.updateInterval);
+    }, Math.max(this.props.updateInterval, Sorter.minUpdateInterval));
   }
 
   render() {
