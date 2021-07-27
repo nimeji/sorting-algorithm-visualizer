@@ -22,11 +22,11 @@ function App() {
     }
     shuffleFisherYates(temp);
     setData(temp);
-  }, [])
+  }, []);
 
   return (
     <div>
-      <Sorter data={data} delay={5}/>
+      <Sorter data={data} delay={0}/>
     </div>
   );
 }

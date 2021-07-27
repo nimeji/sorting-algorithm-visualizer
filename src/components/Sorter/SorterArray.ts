@@ -50,4 +50,8 @@ export class SorterArray {
     this.set(i, this.get(j));
     this.set(j, temp);
   }
+
+  getValues() {
+    return cloneArray(this.array);
+  }
 }

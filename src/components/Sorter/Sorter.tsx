@@ -14,7 +14,6 @@ export type SorterProps = {
 type SorterState = {
   buttonDisabled: boolean;
   generator: Generator | undefined;
-  performanceTimer: number;
   sorted: number[];
 }
 
@@ -56,7 +55,9 @@ export class Sorter extends Component<SorterProps, SorterState> {
   private values: SorterArray = new SorterArray([], () => true);
   private needUpdate: boolean = false;
   private currentStep: number = 0;
-
+  private t0: number = 0;
+  private sleepT0: number = 0;
+  private trueDelay: number = 0;
 
   constructor(props: SorterProps) {
     super(props);
@@ -64,15 +65,21 @@ export class Sorter extends Component<SorterProps, SorterState> {
     this.state = {
       buttonDisabled: false,
       generator: undefined,
-      performanceTimer: performance.now(),
       sorted: [],
     };
 
-    this.runNext = this.runNext.bind(this);
+    this.start = this.start.bind(this);
+    this.updateLoop = this.updateLoop.bind(this);
+  }
+
+  initValues() {
+    this.values = new SorterArray(this.props.data, Sorter.compareFn);
+    this.forceUpdate();
   }
 
   componentDidMount() {
-    // this.setState({values: cloneArray(this.props.data)});
+    this.trueDelay = Math.max(Sorter.minDelay, this.props.delay);
+    this.initValues();
   }
 
   componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
@@ -81,27 +88,27 @@ export class Sorter extends Component<SorterProps, SorterState> {
         generator: undefined,
       });
 
-      this.values = new SorterArray(this.props.data, Sorter.compareFn);
+      this.initValues();
     }
 
     if (this.values.length > 0 && !this.state.generator) {
       this.setState({
         generator: bubbleSort(this.values),
       });
-      this.start();
+    }
+
+    if(prevProps.delay !== this.props.delay) {
+      this.trueDelay = Math.max(Sorter.minDelay, this.props.delay);
     }
   }
 
   runNext() {
     const {
       generator,
-      performanceTimer,
     } = this.state;
 
     if(generator) {
-      this.sleepTime = performance.now() - performanceTimer - this.realTime;
       const result = generator.next().value;
-      this.realTime = performance.now() - performanceTimer - this.sleepTime;
 
       if(result){
         const [i, j, sorted] = result;
@@ -112,44 +119,48 @@ export class Sorter extends Component<SorterProps, SorterState> {
         return true;
       } else {
         this.compared = [undefined, undefined];
-
-        this.setState({
-          buttonDisabled: true,
-        });
       }
 
       return false;
     }
   }
+  
+  updateLoop() {
+    this.sleepTime = this.sleepTime + performance.now() - this.sleepT0;
+
+    let hasNext;
+    do {
+      hasNext = this.runNext();
+      this.currentStep = this.currentStep + 1;
+    } while(this.sleepTime > this.props.delay * this.currentStep && hasNext)
+    
+    this.realTime = performance.now() - this.t0 - this.sleepTime;
+
+    if(!hasNext) {
+      this.forceUpdate()
+      this.needUpdate = false;
+    } else {
+      this.sleepT0 = performance.now();
+      this.needUpdate = true;
+      setTimeout(this.updateLoop, this.trueDelay)
+    }
+  }
 
   start() {
-    this.setState({
-      performanceTimer: performance.now(),
-    });
+    this.t0 = performance.now();
+    this.sleepT0 = this.t0;
+    setTimeout(this.updateLoop, 0);
 
-    const timer = setInterval(() => {
-      let hasNext;
-
-      do {
-        hasNext = this.runNext();
-        this.currentStep = this.currentStep + 1;
-        
-      } while(this.sleepTime > this.props.delay * this.currentStep && hasNext)
-
-      if(!hasNext) {
-        clearTimeout(timer);
-        this.forceUpdate()
-        this.needUpdate = false;
-      } else {
-        this.needUpdate = true;
-      }
-    }, Math.max(this.props.delay, Sorter.minDelay));
     setInterval(() => {
       if(this.needUpdate) {
         this.forceUpdate();
         this.needUpdate = false;
       }
     }, Math.max(this.props.updateInterval, Sorter.minUpdateInterval));
+
+    this.setState({
+      buttonDisabled: true,
+    })
   }
 
   render() {
@@ -183,9 +194,9 @@ export class Sorter extends Component<SorterProps, SorterState> {
         </div>
 
         <button 
-          onClick={this.runNext}
+          onClick={this.start}
           disabled={buttonDisabled}
-        >Continue</button>
+        >Start</button>
       </div>
     );
   }
