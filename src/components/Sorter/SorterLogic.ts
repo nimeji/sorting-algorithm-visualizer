@@ -1,25 +1,6 @@
+import { algorithms } from "./SorterAlgorithms";
 import { SorterArray } from "./SorterArray";
 
-function* bubbleSort(array: SorterArray) {
-  let sorted: number[] = [];
-  const length = array.length;
-
-  for(let i = 0; i < length - 1; i++) {
-    let j;
-    for(j = 0; j < length - 1 - i; j++) {
-      yield [j, j+1, sorted];
-
-      if(array.compare(j, j+1)) {
-        array.swap(j, j+1);
-      }
-    }
-    sorted = [j, ...sorted];
-  }
-  sorted = [0, ...sorted];
-  yield [undefined, undefined, sorted];
-
-  return;
-}
 
 export class SorterLogic {
   static compareFn = (i: number, j: number) => i > j;
@@ -45,7 +26,7 @@ export class SorterLogic {
 
   constructor(data: number[], delay: number) {
     this.values = new SorterArray(data, SorterLogic.compareFn);
-    this.generator = bubbleSort(this.values);
+    this.generator = algorithms.BubbleSort(this.values);
 
     this.delay = Math.max(delay, 0);
     this.trueDelay = Math.max(SorterLogic.minDelay, this.delay);

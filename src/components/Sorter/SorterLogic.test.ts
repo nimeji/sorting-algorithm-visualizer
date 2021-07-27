@@ -63,22 +63,6 @@ describe('SorterLogic', () => {
       while(instance.runNext() && i--) {}
     });
 
-    it('results in a sorted array', () => {
-      const values = instance.getValues();
-      for(let i = 0; i < values.length - 1; i++) {
-        expect(values[i]).toBeLessThanOrEqual(values[i+1]);
-      }
-    });
-
-    it('marks all indices as sorted', () => {
-      const sorted = instance.getIndicesSorted();
-      const values = instance.getValues();
-
-      for(let i = 0; i < values.length; i++) {
-        expect(sorted[i]).toBe(i);
-      }
-    });
-
     it('returns the correct state', () => {
       const [values, sorted, lastCompared, comparisons, accesses] = instance.getLastState();
       
