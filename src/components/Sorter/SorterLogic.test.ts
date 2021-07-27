@@ -10,14 +10,22 @@ describe('SorterLogic', () => {
     });
 
     it('has correct values array', () => {
-      for(let i = 0; i < instance['values'].length; i++) {
-        expect(instance['values'].value(i)).toBe(data[i]);
+      const values = instance.getValues();
+      for(let i = 0; i < data.length; i++) {
+        expect(values[i]).toBe(data[i]);
       }
+    });
+
+    it('returns a copy of the array', () => {
+      const values1 = instance.getValues();
+      const values2 = instance.getValues();
+
+      expect(values1).not.toBe(values2);
     });
 
     it('clamps negative delays to zero', () => {
       instance = new SorterLogic(data, -1);
-      expect(instance['delay']).toBe(0);
+      expect(instance.getDelay()).toBe(0);
     });
 
     it('has a valid minDelay', () => {
@@ -26,33 +34,24 @@ describe('SorterLogic', () => {
 
     it('has correct delay', () => {
       instance = new SorterLogic(data, 5);
-      expect(instance['delay']).toBe(5);
+      expect(instance.getDelay()).toBe(5);
     });
 
     it('clamps trueDelay to minDelay', () => {
       instance = new SorterLogic(data, 0);
-      expect(instance['trueDelay']).toBe(SorterLogic.minDelay);
+      expect(instance.getTrueDelay()).toBe(SorterLogic.minDelay);
     });
 
     it('has correct trueDelay', () => {
       const delay = SorterLogic.minDelay + 1
       instance = new SorterLogic(data, delay);
-      expect(instance['trueDelay']).toBe(delay);
+      expect(instance.getTrueDelay()).toBe(delay);
     });
 
-    it('returns lastCompared correctly', () => {
-      instance['lastCompared'] = [123, 456];
-
-      const lc = instance.getLastCompared();
-      expect(lc[0]).toBe(123);
-      expect(lc[1]).toBe(456);
-    });
-
-    it('returns indicesSorted correctly', () => {
-      const numbers = [3, 1, 634, 12, 3];
-      instance['indidcesSorted'] = numbers;
-
-      expect(instance.getIndicesSorted()).toBe(numbers);
+    it('indicates an update after running', () => {
+      expect(instance.didUpdate()).toBeFalsy();
+      instance.runNext();
+      expect(instance.didUpdate()).toBeTruthy();
     });
   });
 
@@ -65,17 +64,46 @@ describe('SorterLogic', () => {
     });
 
     it('results in a sorted array', () => {
-      for(let i = 0; i < instance['values'].length - 1; i++) {
-        expect(instance['values'].value(i)).toBeLessThanOrEqual(instance['values'].value(i+1));
+      const values = instance.getValues();
+      for(let i = 0; i < values.length - 1; i++) {
+        expect(values[i]).toBeLessThanOrEqual(values[i+1]);
       }
     });
 
     it('marks all indices as sorted', () => {
       const sorted = instance.getIndicesSorted();
-      
-      for(let i = 0; i < instance['values'].length; i++) {
+      const values = instance.getValues();
+
+      for(let i = 0; i < values.length; i++) {
         expect(sorted[i]).toBe(i);
       }
+    });
+
+    it('returns the correct state', () => {
+      const [values, sorted, lastCompared, comparisons, accesses] = instance.getLastState();
+      
+      const values2 = instance.getValues();
+      for(let i = 0; i < values.length; i++) {
+        expect(values[i]).toBe(values2[i]);
+      }
+
+      const sorted2 = instance.getIndicesSorted();
+      for(let i = 0; i < sorted.length; i++) {
+        expect(sorted[i]).toBe(sorted2[i]);
+      }
+
+      const lastCompared2 = instance.getLastCompared();
+      expect(lastCompared[0]).toBe(lastCompared2[0]);
+      expect(lastCompared[1]).toBe(lastCompared2[1]);
+
+      expect(comparisons).toBe(instance.getComparisons());
+      expect(accesses).toBe(instance.getAccesses());
+    });
+
+    it('resets didUpdate after calling getLastState', () => {
+      expect(instance.didUpdate()).toBeTruthy();
+      instance.getLastState();
+      expect(instance.didUpdate()).toBeFalsy();
     });
   });
 });

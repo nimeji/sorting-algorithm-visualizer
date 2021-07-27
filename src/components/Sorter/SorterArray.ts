@@ -1,5 +1,5 @@
 
-function cloneArray(array: Array<any>) {
+function cloneArray<T>(array: Array<T>) {
   const result = [];
   let i = array.length;
   while(i--) {

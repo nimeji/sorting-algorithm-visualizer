@@ -4,21 +4,13 @@ import { Sorter, SorterProps } from './Sorter';
 
 describe('Sorter', () => {
   let wrapper: ReactWrapper<typeof Sorter, SorterProps, {}>
-  let instance: any;
   const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
   const length = data.length;
 
   describe('after mounting', () => {
     beforeEach(() => {
       wrapper = mount(<Sorter data={data} delay={0} />)
-      instance = wrapper.instance();
     });
-  
-    it('has correct values array', () => {
-      for(let i = 0; i < instance.values.length; i++) {
-        expect(instance.values.value(i)).toBe(instance.props.data[i]);
-      }
-    })
   
     it('renders correct number of SorterValues', () => {
       expect(wrapper.find(SorterValue).length).toBe(length);

@@ -2,7 +2,7 @@ import styles from './Sorter.module.scss';
 
 import { SorterValue } from "../SorterValue/SorterValue";
 import { Component } from 'react';
-import { SorterArray } from './SorterArray';
+import { SorterLogic } from './SorterLogic';
 
 export type SorterProps = {
   data: number[];
@@ -13,29 +13,7 @@ export type SorterProps = {
 
 type SorterState = {
   buttonDisabled: boolean;
-  generator: Generator | undefined;
-  sorted: number[];
-}
-
-function* bubbleSort(array: SorterArray) {
-  let sorted: number[] = [];
-  const length = array.length;
-
-  for(let i = 0; i < length - 1; i++) {
-    let j;
-    for(j = 0; j < length - 1 - i; j++) {
-      yield [j, j+1, sorted];
-
-      if(array.compare(j, j+1)) {
-        array.swap(j, j+1);
-      }
-    }
-    sorted = [j, ...sorted];
-  }
-  sorted = [0, ...sorted];
-  yield [undefined, undefined, sorted];
-
-  return;
+  logic: SorterLogic;
 }
 
 export class Sorter extends Component<SorterProps, SorterState> {
@@ -44,93 +22,50 @@ export class Sorter extends Component<SorterProps, SorterState> {
     delay: 100,
     updateInterval: 1000/24,
   }
-  static compareFn = (i: number, j: number) => i > j;
-  static minDelay = 10;
-  static minUpdateInterval = 10;
 
-  private compared: [number | undefined, number | undefined] = [undefined, undefined];
+  private static minUpdateInterval = 50;
+
   private realTime: number = 0;
   private sleepTime: number = 0;
-  private sorted: number[] = [];
-  private values: SorterArray = new SorterArray([], () => true);
-  private needUpdate: boolean = false;
+
   private currentStep: number = 0;
   private t0: number = 0;
   private sleepT0: number = 0;
-  private trueDelay: number = 0;
+
+  private needUpdate = false;
 
   constructor(props: SorterProps) {
     super(props);
 
     this.state = {
       buttonDisabled: false,
-      generator: undefined,
-      sorted: [],
+      logic: new SorterLogic(props.data, props.delay),
     };
 
     this.start = this.start.bind(this);
     this.updateLoop = this.updateLoop.bind(this);
   }
 
-  initValues() {
-    this.values = new SorterArray(this.props.data, Sorter.compareFn);
-    this.forceUpdate();
-  }
-
   componentDidMount() {
-    this.trueDelay = Math.max(Sorter.minDelay, this.props.delay);
-    this.initValues();
+
   }
 
   componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
     if (prevProps.data !== this.props.data) {
       this.setState({
-        generator: undefined,
+        logic: new SorterLogic(this.props.data, this.props.delay),
       });
-
-      this.initValues();
-    }
-
-    if (this.values.length > 0 && !this.state.generator) {
-      this.setState({
-        generator: bubbleSort(this.values),
-      });
-    }
-
-    if(prevProps.delay !== this.props.delay) {
-      this.trueDelay = Math.max(Sorter.minDelay, this.props.delay);
-    }
-  }
-
-  runNext() {
-    const {
-      generator,
-    } = this.state;
-
-    if(generator) {
-      const result = generator.next().value;
-
-      if(result){
-        const [i, j, sorted] = result;
-
-        this.compared = [i, j];
-        this.sorted = sorted;
-
-        return true;
-      } else {
-        this.compared = [undefined, undefined];
-      }
-
-      return false;
     }
   }
   
   updateLoop() {
+    const { logic } = this.state
+
     this.sleepTime = this.sleepTime + performance.now() - this.sleepT0;
 
     let hasNext;
     do {
-      hasNext = this.runNext();
+      hasNext = logic.runNext();
       this.currentStep = this.currentStep + 1;
     } while(this.sleepTime > this.props.delay * this.currentStep && hasNext)
     
@@ -142,7 +77,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
     } else {
       this.sleepT0 = performance.now();
       this.needUpdate = true;
-      setTimeout(this.updateLoop, this.trueDelay)
+      setTimeout(this.updateLoop, logic.getTrueDelay());
     }
   }
 
@@ -165,19 +100,22 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
   render() {
     const { 
-      buttonDisabled, 
+      buttonDisabled,
+      logic,
     } = this.state;
 
     const { decimals } = this.props;
 
+    const [values, sorted, lastCompared, comparisons, accesses] = logic.getLastState();
+
     const elements = [];
-    for(let i = 0; i < this.values.length; i++) {
+    for(let i = 0; i < values.length; i++) {
       elements[i] = <SorterValue 
         key={i} 
-        height={this.values.value(i) * 100} 
-        width={100/this.values.length} 
-        selected={this.compared.includes(i)}
-        sorted={this.sorted.includes(i)}
+        height={values[i] * 100} 
+        width={100/values.length} 
+        selected={lastCompared.includes(i)}
+        sorted={sorted.includes(i)}
       />
     }
 
@@ -187,8 +125,8 @@ export class Sorter extends Component<SorterProps, SorterState> {
           {elements}
         </div>
         <div className={styles.Metrics}>
-          <div id="comparisions">Comparisons: <span>{this.values.comparisons}</span></div>
-          <div id="accesses">Array Accesses: <span>{this.values.accesses}</span></div>
+          <div id="comparisions">Comparisons: <span>{comparisons}</span></div>
+          <div id="accesses">Array Accesses: <span>{accesses}</span></div>
           <div id="real-time">Real Time: <span>{this.realTime.toFixed(decimals)}</span>ms</div>
           <div id="sleep-time">Sleep Time: <span>{this.sleepTime.toFixed(decimals)}</span>ms</div>
         </div>
