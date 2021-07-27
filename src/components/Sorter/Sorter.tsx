@@ -25,15 +25,6 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
   private static minUpdateInterval = 50;
 
-  private realTime: number = 0;
-  private sleepTime: number = 0;
-
-  private currentStep: number = 0;
-  private t0: number = 0;
-  private sleepT0: number = 0;
-
-  private needUpdate = false;
-
   constructor(props: SorterProps) {
     super(props);
 
@@ -43,11 +34,6 @@ export class Sorter extends Component<SorterProps, SorterState> {
     };
 
     this.start = this.start.bind(this);
-    this.updateLoop = this.updateLoop.bind(this);
-  }
-
-  componentDidMount() {
-
   }
 
   componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
@@ -57,39 +43,13 @@ export class Sorter extends Component<SorterProps, SorterState> {
       });
     }
   }
-  
-  updateLoop() {
-    const { logic } = this.state
-
-    this.sleepTime = this.sleepTime + performance.now() - this.sleepT0;
-
-    let hasNext;
-    do {
-      hasNext = logic.runNext();
-      this.currentStep = this.currentStep + 1;
-    } while(this.sleepTime > this.props.delay * this.currentStep && hasNext)
-    
-    this.realTime = performance.now() - this.t0 - this.sleepTime;
-
-    if(!hasNext) {
-      this.forceUpdate()
-      this.needUpdate = false;
-    } else {
-      this.sleepT0 = performance.now();
-      this.needUpdate = true;
-      setTimeout(this.updateLoop, logic.getTrueDelay());
-    }
-  }
 
   start() {
-    this.t0 = performance.now();
-    this.sleepT0 = this.t0;
-    setTimeout(this.updateLoop, 0);
+    this.state.logic.start();
 
     setInterval(() => {
-      if(this.needUpdate) {
+      if(this.state.logic.didUpdate()) {
         this.forceUpdate();
-        this.needUpdate = false;
       }
     }, Math.max(this.props.updateInterval, Sorter.minUpdateInterval));
 
@@ -127,8 +87,8 @@ export class Sorter extends Component<SorterProps, SorterState> {
         <div className={styles.Metrics}>
           <div id="comparisions">Comparisons: <span>{comparisons}</span></div>
           <div id="accesses">Array Accesses: <span>{accesses}</span></div>
-          <div id="real-time">Real Time: <span>{this.realTime.toFixed(decimals)}</span>ms</div>
-          <div id="sleep-time">Sleep Time: <span>{this.sleepTime.toFixed(decimals)}</span>ms</div>
+          <div id="real-time">Real Time: <span>{logic.getRealTime().toFixed(decimals)}</span>ms</div>
+          <div id="sleep-time">Sleep Time: <span>{logic.getSleepTime().toFixed(decimals)}</span>ms</div>
         </div>
 
         <button 

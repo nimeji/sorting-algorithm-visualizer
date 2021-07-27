@@ -59,8 +59,7 @@ describe('SorterLogic', () => {
     beforeEach(() => {
       instance = new SorterLogic(data, 0);
 
-      let i = 300;
-      while(instance.runNext() && i--) {}
+      instance.start();
     });
 
     it('returns the correct state', () => {
@@ -82,6 +81,22 @@ describe('SorterLogic', () => {
 
       expect(comparisons).toBe(instance.getComparisons());
       expect(accesses).toBe(instance.getAccesses());
+    });
+
+    it('returns comparisons', () => {
+      expect(instance.getComparisons()).toBeGreaterThan(0);
+    });
+
+    it('returns accesses', () => {
+      expect(instance.getAccesses()).toBeGreaterThan(0);
+    });
+
+    it('returns sleepTime', () => {
+      expect(instance.getSleepTime()).toBeGreaterThan(0);
+    });
+
+    it('returns realTime', () => {
+      expect(instance.getRealTime()).toBeGreaterThan(0);
     });
 
     it('resets didUpdate after calling getLastState', () => {

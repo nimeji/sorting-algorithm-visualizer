@@ -16,7 +16,7 @@ function App() {
 
   useEffect(() => {
     const temp = [];
-    const len = 20;
+    const len = 200;
     for(let i=0; i<len; i++) {
       temp[i] = 1/len * (i+1);
     }
