@@ -32,7 +32,7 @@ describe('SorterAlgorithms', () => {
 
     it('results in a sorted array', () => {
       for(let i = 0; i < array.length - 1; i++) {
-        expect(compareFn(array.value(i), array.value(i+1))).toBeFalsy();
+        expect(compareFn(array.value(i), array.value(i+1))).toBeTruthy();
       }
     });
 

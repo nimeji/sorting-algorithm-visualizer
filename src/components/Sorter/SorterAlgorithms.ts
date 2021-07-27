@@ -13,7 +13,7 @@ function* bubbleSort(array: SorterArray): SorterAlgorithmGenerator {
     for(j = 0; j < length - 1 - i; j++) {
       yield [j, j+1, sorted];
 
-      if(array.compare(j, j+1)) {
+      if(!array.compare(j, j+1)) {
         array.swap(j, j+1);
       }
     }
