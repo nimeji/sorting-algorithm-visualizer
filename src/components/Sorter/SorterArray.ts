@@ -12,8 +12,8 @@ function cloneArray(array: Array<any>) {
 export class SorterArray {
   private array: number[];
   private compareFn: (a: number, b: number) => boolean;
-  public accesses: number = 0;
-  public comparisons: number = 0;
+  private _accesses: number = 0;
+  private _comparisons: number = 0;
 
   constructor(array: number[], compareFn: (a: number, b: number) => boolean) {
     this.array = cloneArray(array);
@@ -29,17 +29,17 @@ export class SorterArray {
   }
 
   get(i: number) {
-    this.accesses = this.accesses + 1;
+    this._accesses = this._accesses + 1;
     return this.array[i];
   }
 
   private set(i: number, v: number) {
-    this.accesses = this.accesses + 1
+    this._accesses = this._accesses + 1
     this.array[i] = v;
   }
 
   compare(i: number, j: number) {
-    this.comparisons = this.comparisons + 1;
+    this._comparisons = this._comparisons + 1;
 
     return this.compareFn(this.get(i), this.get(j));
   }
@@ -51,7 +51,15 @@ export class SorterArray {
     this.set(j, temp);
   }
 
-  getValues() {
+  get accesses() {
+    return this._accesses;
+  }
+
+  get comparisons() {
+    return this._comparisons;
+  }
+
+  get values() {
     return cloneArray(this.array);
   }
 }
