@@ -24,16 +24,26 @@ export class SorterArray {
     return this.array.length;
   }
 
+  private validateIndex(i: number) {
+    if(i >= this.array.length || i < 0) throw new RangeError('index out of range');
+  }
+
   value(i: number) {
+    this.validateIndex(i);  
+
     return this.array[i];
   }
 
   get(i: number) {
+    this.validateIndex(i);  
+
     this._accesses = this._accesses + 1;
     return this.array[i];
   }
 
   private set(i: number, v: number) {
+    this.validateIndex(i);    
+
     this._accesses = this._accesses + 1
     this.array[i] = v;
   }
