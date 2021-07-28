@@ -109,7 +109,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
         height={values[i] * 100} 
         width={100/values.length} 
         selected={lastCompared.includes(i)}
-        sorted={indicesSorted.includes(i)}
+        sorted={indicesSorted.has(i)}
       />
     }
 

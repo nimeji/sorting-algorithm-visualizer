@@ -12,7 +12,7 @@ export class SorterLogic {
 
   private generator: SorterAlgorithmGenerator;
   private values: SorterArray;
-  private indidcesSorted: number[] = [];
+  private indidcesSorted = new Set<number>();
   private lastCompared: [number | undefined, number | undefined] = [undefined, undefined];
 
   private step = 0;
@@ -105,7 +105,7 @@ export class SorterLogic {
   }
 
   getIndicesSorted() {
-    return [...this.indidcesSorted];
+    return new Set(this.indidcesSorted);
   }
 
   getValues() {

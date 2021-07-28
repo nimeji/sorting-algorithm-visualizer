@@ -43,7 +43,7 @@ describe('SorterAlgorithms', () => {
     it('marks all indices as sorted', () => {
       const [,, sorted] = result;
       for(let i = 0; i < array.length; i++) {
-        expect(sorted[i]).toBe(i);
+        expect(sorted.has(i)).toBeTruthy();
       }
     });
   });
