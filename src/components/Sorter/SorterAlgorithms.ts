@@ -130,9 +130,55 @@ function* insertionSort(array: SorterArray): SorterAlgorithmGenerator {
   return;
 }
 
+function* quickSort(array: SorterArray): SorterAlgorithmGenerator {
+  const sorted = new Set<number>();
+  const length = array.length;
+
+  if(length <= 0) return;
+
+  function* qs(lo: number, hi: number): SorterAlgorithmGenerator {
+    if(lo < hi)
+    {
+      let mid = Math.floor((lo + hi)/2);
+      let i = lo - 1;
+      let j = hi + 1;
+      while(true) {
+        do {
+          i = i + 1;
+          yield [i, mid, sorted];
+        } while(array.compare(i, mid))
+        do {
+          j = j - 1;
+          yield [mid, j, sorted];
+        } while(array.compare(mid, j))
+        if(i >= j) {
+          break
+        }
+        array.swap(i, j);
+        if(mid === i) {
+          mid = j
+        } else if(mid === j) {
+          mid = i
+        }
+      }
+    
+      yield* qs(lo, j);
+      yield* qs(j+1, hi);
+    } else {
+      sorted.add(lo);
+    }
+  }
+
+  yield* qs(0, length-1);
+  yield [undefined, undefined, sorted];
+
+  return;
+}
+
 export const algorithms = {
   BubbleSort: bubbleSort,
   CocktailShakerSort: cocktailShakerSort,
   SelectionSort: selectionSort,
   InsertionSort: insertionSort,
+  QuickSort: quickSort,
 }
