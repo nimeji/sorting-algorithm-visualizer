@@ -11,6 +11,24 @@ describe('SorterArray', () => {
     instance = new SorterArray(data, (i: number, j: number) => i > j);
   });
 
+  it('throws an error when an index is out of range', () => {
+    expect(() => instance.get(-1)).toThrowError(RangeError);
+    expect(() => instance.get(instance.length)).toThrowError(RangeError);
+
+    expect(() => instance.value(-1)).toThrowError(RangeError);
+    expect(() => instance.value(instance.length)).toThrowError(RangeError);
+
+    expect(() => instance.swap(-1, 0)).toThrowError(RangeError);
+    expect(() => instance.swap(instance.length, 0)).toThrowError(RangeError);
+    expect(() => instance.swap(0, -1)).toThrowError(RangeError);
+    expect(() => instance.swap(0, instance.length)).toThrowError(RangeError);
+
+    expect(() => instance.compare(-1, 0)).toThrowError(RangeError);
+    expect(() => instance.compare(instance.length, 0)).toThrowError(RangeError);
+    expect(() => instance.compare(0, -1)).toThrowError(RangeError);
+    expect(() => instance.compare(0, instance.length)).toThrowError(RangeError);
+  });
+
   it('returns the correct array length', () => {
     expect(instance.length).toBe(data.length);
   })
@@ -82,5 +100,5 @@ describe('SorterArray', () => {
 
   it('returns the correct result for compare', () => {
     expect(instance.compare(a, b)).toBeFalsy();
-  })
+  });
 });
