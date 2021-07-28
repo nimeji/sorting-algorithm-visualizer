@@ -36,6 +36,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
     this.start = this.start.bind(this);
     this.pause = this.pause.bind(this);
+    this.reset = this.reset.bind(this);
   }
 
   componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
@@ -46,30 +47,43 @@ export class Sorter extends Component<SorterProps, SorterState> {
     }
   }
 
+  update() {
+    if(this.state.logic.didUpdate()) {
+      this.forceUpdate();
+    }
+  }
+
   start() {
     this.state.logic.start();
 
-    this.timeout = setInterval(() => {
-      if(this.state.logic.didUpdate()) {
-        this.forceUpdate();
-      }
-    }, Math.max(this.props.updateInterval, Sorter.minUpdateInterval));
+    if(!this.timeout) {
+      this.timeout = setInterval(() => this.update(), Math.max(this.props.updateInterval, Sorter.minUpdateInterval));
+    }
 
     this.setState({
       buttonDisabled: true,
-    })
+    });
   }
 
   pause() {
     this.state.logic.pause();
 
     if(this.timeout) {
-      clearTimeout(this.timeout);
+      clearInterval(this.timeout);
+      this.timeout = undefined;
     }
 
     this.setState({
       buttonDisabled: false,
     });
+  }
+
+  reset() {
+    this.pause();
+
+    this.setState({
+      logic: new SorterLogic(this.props.data, this.props.delay),
+    })
   }
 
   render() {
@@ -105,13 +119,19 @@ export class Sorter extends Component<SorterProps, SorterState> {
           <div>Sleep Time: <span id="sleep-time">{logic.getSleepTime().toFixed(decimals)}</span>ms</div>
         </div>
 
-        <button 
+        <button
+          id="btn-start"
           onClick={this.start}
           disabled={buttonDisabled}
         >Start</button>
         <button
+          id="btn-pause"
           onClick={this.pause}
         >Pause</button>
+        <button
+          id="btn-reset"
+          onClick={this.reset}
+        >Reset</button>
       </div>
     );
   }
