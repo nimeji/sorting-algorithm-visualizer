@@ -210,7 +210,36 @@ function* HeapSort(array: SorterArray): SorterAlgorithmGenerator {
     sorted.add(end);
     yield* shiftDown(0, end-1);
   }
-  
+
+  sorted.add(0);
+  yield [undefined, undefined, sorted];
+
+  return;
+}
+
+function* ShellSort(array: SorterArray): SorterAlgorithmGenerator {
+  const sorted = new Set<number>();
+  const length = array.length;
+  const gaps = [701, 301, 132, 57, 23, 10, 4, 1]
+
+  if(length <= 0) return;
+
+  for(let gap of gaps) {
+    for(let i = gap; i < length; i++) {
+      for(let j = i; j >= gap; j -= gap) {
+        yield [j - gap, j, sorted];
+        if(!array.compare(j - gap, j)) {
+          array.swap(j - gap, j);
+        } else {
+          break;
+        }
+      }
+      if(gap === 1) {
+        sorted.add(i);
+      }
+    }
+  }
+
   sorted.add(0);
   yield [undefined, undefined, sorted];
 
@@ -224,4 +253,5 @@ export const algorithms = {
   InsertionSort,
   QuickSort,
   HeapSort,
+  ShellSort,
 }
