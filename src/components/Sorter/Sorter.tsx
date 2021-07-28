@@ -23,8 +23,10 @@ export class Sorter extends Component<SorterProps, SorterState> {
     updateInterval: 1000/24,
   }
 
-  private timeout: NodeJS.Timeout | undefined;
   private static minUpdateInterval = 50;
+
+  private timeout = 0;
+  private running = false;
 
   constructor(props: SorterProps) {
     super(props);
@@ -54,10 +56,10 @@ export class Sorter extends Component<SorterProps, SorterState> {
   }
 
   start() {
-    this.state.logic.start();
-
-    if(!this.timeout) {
-      this.timeout = setInterval(() => this.update(), Math.max(this.props.updateInterval, Sorter.minUpdateInterval));
+    if(!this.running) {
+      this.state.logic.start();
+      this.timeout = window.setInterval(() => this.update(), Math.max(this.props.updateInterval, Sorter.minUpdateInterval));
+      this.running = true;
     }
 
     this.setState({
@@ -66,11 +68,10 @@ export class Sorter extends Component<SorterProps, SorterState> {
   }
 
   pause() {
-    this.state.logic.pause();
-
-    if(this.timeout) {
+    if(this.running) {
+      this.state.logic.pause();
       clearInterval(this.timeout);
-      this.timeout = undefined;
+      this.running = false;
     }
 
     this.setState({
