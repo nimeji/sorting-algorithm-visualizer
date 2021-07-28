@@ -55,6 +55,7 @@ describe('Sorter', () => {
     let mockStart: jest.SpyInstance
     let mockPause: jest.SpyInstance; 
     let mockUpdate: jest.SpyInstance;
+    let mockForceUpdate: jest.SpyInstance;
 
     beforeEach(() => {
       jest.spyOn(SorterLogic.prototype, 'getLastState').mockReturnValue({
@@ -74,6 +75,7 @@ describe('Sorter', () => {
       wrapper = mount(<Sorter data={data} delay={0} />);
       instance = wrapper.instance();
       mockUpdate = jest.spyOn(instance, 'update');
+      mockForceUpdate = jest.spyOn(instance, 'forceUpdate');
     });
 
     it('shows the correct SorterValues as Sorted', () => {
@@ -119,6 +121,20 @@ describe('Sorter', () => {
       expect(mockUpdate).not.toHaveBeenCalled();
     });
 
+    it('doesnt call start when already started', () => {
+      instance.start();
+      instance.start();
+      expect(mockStart).toHaveBeenCalledTimes(1);
+    });
+
+    it('doesnt call pause when already paused', () => {
+      instance.start();
+      instance.pause();
+      instance.pause();
+
+      expect(mockPause).toHaveBeenCalledTimes(1);
+    });
+
     it('continues sorting after pause', () => {
       instance.start();
       instance.pause();
@@ -128,9 +144,30 @@ describe('Sorter', () => {
       expect(mockUpdate).toHaveBeenCalledTimes(10);
     });
 
-    // it('resets after calling reset', () => {
-    //   wrapper.instance().reset();
-    //   expect(mockPause).toHaveBeenCalled();
-    // });
+    it('indicates correctly whether it is running', () => {
+      expect(instance.isRunning()).toBeFalsy();
+      instance.start();
+      expect(instance.isRunning()).toBeTruthy();
+      instance.pause();
+      expect(instance.isRunning()).toBeFalsy();
+    });
+
+    it('resets after calling reset', () => {
+      const prevLogic = instance.state.logic;
+      wrapper.instance().reset();
+      expect(instance.isRunning()).toBeFalsy();
+      expect(instance.state.logic).not.toBe(prevLogic);
+    });
+
+    it('doesnt call forceUpdate when there is no update', () => {
+      instance.update();
+      expect(mockForceUpdate).not.toBeCalled();
+    });
+
+    it('calls forceUpdate when there is an update', () => {
+      jest.spyOn(SorterLogic.prototype, 'didUpdate').mockReturnValue(true);
+      instance.update();
+      expect(mockForceUpdate).toHaveBeenCalled();
+    });
   });
 });

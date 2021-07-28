@@ -29,7 +29,7 @@ describe('SorterLogic', () => {
 
   describe('after initialization', () => {
     beforeEach(() => {
-      instance = new SorterLogic(data, 5);
+      instance = new SorterLogic(data, 'BubbleSort', 5);
     });
 
     it('has correct values array', () => {
@@ -47,23 +47,23 @@ describe('SorterLogic', () => {
     });
 
     it('clamps negative delays to zero', () => {
-      instance = new SorterLogic(data, -1);
+      instance = new SorterLogic(data, 'BubbleSort', -1);
       expect(instance.getDelay()).toBe(0);
     });
 
     it('has correct delay', () => {
-      instance = new SorterLogic(data, 5);
+      instance = new SorterLogic(data, 'BubbleSort', 5);
       expect(instance.getDelay()).toBe(5);
     });
 
     it('clamps trueDelay to minDelay', () => {
-      instance = new SorterLogic(data, 0);
+      instance = new SorterLogic(data, 'BubbleSort', 0);
       expect(instance.getTrueDelay()).toBe(SorterLogic.minDelay);
     });
 
     it('has correct trueDelay', () => {
       const delay = SorterLogic.minDelay + 1
-      instance = new SorterLogic(data, delay);
+      instance = new SorterLogic(data, 'BubbleSort', delay);
       expect(instance.getTrueDelay()).toBe(delay);
     });
 
@@ -84,7 +84,7 @@ describe('SorterLogic', () => {
       jest.spyOn(SorterArray.prototype, 'accesses', 'get').mockReturnValue(accesses);
       jest.useFakeTimers();
 
-      instance = new SorterLogic(data, SorterLogic.minDelay);
+      instance = new SorterLogic(data, 'BubbleSort', SorterLogic.minDelay);
       spyRunNext = jest.spyOn(instance, 'runNext');
     });
 

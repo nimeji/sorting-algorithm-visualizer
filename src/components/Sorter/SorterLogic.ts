@@ -25,9 +25,10 @@ export class SorterLogic {
 
   private updated = false;
 
-  constructor(data: number[], delay: number) {
+  constructor(data: number[], algorithm: keyof typeof algorithms, delay: number) {
     this.values = new SorterArray(data, SorterLogic.compareFn);
-    this.generator = algorithms.BubbleSort(this.values);
+
+    this.generator = algorithms[algorithm](this.values);
 
     this.setDelay(delay);
 

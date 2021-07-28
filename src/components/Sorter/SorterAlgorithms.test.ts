@@ -3,7 +3,7 @@ import { algorithms, SorterAlgorithmGenerator, SorterAlgorithmType, SorterAlgori
 
 describe('SorterAlgorithms', () => {
   const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
-  const compareFn = (i: number, j: number) => i > j;
+  const compareFn = (i: number, j: number) => i < j;
   let array: SorterArray;
 
   beforeEach(() => {
@@ -12,6 +12,7 @@ describe('SorterAlgorithms', () => {
 
   describe.each([
     ['BubbleSort', algorithms.BubbleSort],
+    ['InsertionSort', algorithms.InsertionSort],
   ])('%s', (name: string, algorithm: SorterAlgorithmType) => {
     let generator: SorterAlgorithmGenerator;
     let result: SorterAlgorithmReturnType;
@@ -24,6 +25,12 @@ describe('SorterAlgorithms', () => {
       while(!(temp = generator.next()).done && i--) {
         result = temp.value;
       }
+    });
+
+    it('returns immediatly if given an empty array', () => {
+      generator = algorithm(new SorterArray([], compareFn));
+
+      expect(generator.next().done).toBeTruthy();
     });
 
     it('terminates', () => {

@@ -3,8 +3,10 @@ import styles from './Sorter.module.scss';
 import { SorterValue } from "../SorterValue/SorterValue";
 import { Component } from 'react';
 import { SorterLogic } from './SorterLogic';
+import { algorithms } from './SorterAlgorithms';
 
 export type SorterProps = {
+  algorithm: keyof typeof algorithms;
   data: number[];
   decimals?: number;
   delay: number;
@@ -18,6 +20,7 @@ type SorterState = {
 
 export class Sorter extends Component<SorterProps, SorterState> {
   static defaultProps = {
+    algorithm: 'BubbleSort',
     decimals: 1,
     delay: 100,
     updateInterval: 1000/24,
@@ -33,7 +36,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
     this.state = {
       buttonDisabled: false,
-      logic: new SorterLogic(props.data, props.delay),
+      logic: new SorterLogic(props.data, this.props.algorithm, props.delay),
     };
 
     this.start = this.start.bind(this);
@@ -42,10 +45,8 @@ export class Sorter extends Component<SorterProps, SorterState> {
   }
 
   componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
-    if (prevProps.data !== this.props.data) {
-      this.setState({
-        logic: new SorterLogic(this.props.data, this.props.delay),
-      });
+    if (prevProps.data !== this.props.data || prevProps.algorithm !== this.props.algorithm) {
+      this.reset();
     }
   }
 
@@ -83,8 +84,12 @@ export class Sorter extends Component<SorterProps, SorterState> {
     this.pause();
 
     this.setState({
-      logic: new SorterLogic(this.props.data, this.props.delay),
-    })
+      logic: new SorterLogic(this.props.data, this.props.algorithm, this.props.delay),
+    });
+  }
+
+  isRunning() {
+    return this.running;
   }
 
   render() {
