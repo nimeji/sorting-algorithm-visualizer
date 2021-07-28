@@ -10,10 +10,7 @@ describe('SorterAlgorithms', () => {
     array = new SorterArray(data, compareFn);
   });
 
-  describe.each([
-    ['BubbleSort', algorithms.BubbleSort],
-    ['InsertionSort', algorithms.InsertionSort],
-  ])('%s', (name: string, algorithm: SorterAlgorithmType) => {
+  describe.each(Object.entries(algorithms))('%s', (name: string, algorithm: SorterAlgorithmType) => {
     let generator: SorterAlgorithmGenerator;
     let result: SorterAlgorithmReturnType;
 
