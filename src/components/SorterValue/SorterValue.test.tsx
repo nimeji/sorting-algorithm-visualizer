@@ -16,15 +16,30 @@ describe('SorterValue', () => {
     expect(wrapper.find('div').prop('style')).toHaveProperty('width', '66%');
   });
 
-  it('has the Selected class if selected', () => {
-    expect(wrapper.hasClass('Selected')).toBeFalsy();
-    wrapper.setProps({selected: true});
-    expect(wrapper.hasClass('Selected')).toBeTruthy();
+  it('only has the default class', () => {
+    expect(wrapper.hasClass('default')).toBeTruthy();
+    expect(wrapper.hasClass('selected')).toBeFalsy();
+    expect(wrapper.hasClass('sorted')).toBeFalsy();
   });
 
-  it('has the Sorted class if sorted', () => {
-    expect(wrapper.hasClass('Sorted')).toBeFalsy();
-    wrapper.setProps({sorted: true});
-    expect(wrapper.hasClass('Sorted')).toBeTruthy();
+  it('only has the selected class if selected', () => {
+    wrapper.setProps({selected: true});
+    expect(wrapper.hasClass('default')).toBeFalsy();
+    expect(wrapper.hasClass('selected')).toBeTruthy();
+    expect(wrapper.hasClass('sorted')).toBeFalsy();
   });
+
+  it('has the sorted class if sorted', () => {
+    wrapper.setProps({sorted: true});
+    expect(wrapper.hasClass('default')).toBeFalsy();
+    expect(wrapper.hasClass('selected')).toBeFalsy();
+    expect(wrapper.hasClass('sorted')).toBeTruthy();
+  });
+
+  it('only has selected class if sorted and selected', () => {
+    wrapper.setProps({sorted: true, selected: true});
+    expect(wrapper.hasClass('default')).toBeFalsy();
+    expect(wrapper.hasClass('selected')).toBeTruthy();
+    expect(wrapper.hasClass('sorted')).toBeFalsy();
+  })
 });

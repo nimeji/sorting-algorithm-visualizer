@@ -9,9 +9,19 @@ export type SorterValueProps = {
 }
 
 export const SorterValue =  React.memo(({height, width, selected=false, sorted=false}: SorterValueProps) => {
+  let colorStyle;
+
+  if(selected) {
+    colorStyle = styles.selected;
+  } else if(sorted) {
+    colorStyle = styles.sorted;
+  } else {
+    colorStyle = styles.default;
+  }
+
   return (
     <div 
-      className={`${styles.SorterValue} ${selected ? styles.Selected : ''} ${sorted ? styles.Sorted : ''}`} 
+      className={`${colorStyle}`} 
       style={{height: `${height}%`, width: `${width}%`}} 
     />
   );
