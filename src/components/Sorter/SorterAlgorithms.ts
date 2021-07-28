@@ -28,7 +28,7 @@ function* bubbleSort(array: SorterArray): SorterAlgorithmGenerator {
 }
 
 function* cocktailShakerSort(array: SorterArray): SorterAlgorithmGenerator {
-let sorted = new Set<number>();
+  let sorted = new Set<number>();
   const length = array.length;
 
   if(length <= 0) return;
@@ -37,9 +37,8 @@ let sorted = new Set<number>();
   let upper = length - 1;
   let swapped = false;
 
-  while(lower < upper) {
+  do {
     swapped = false;
-
     for(let i = lower; i < upper; i++) {
       yield [i, i+1, sorted];
       if(!array.compare(i, i+1)) {
@@ -47,12 +46,13 @@ let sorted = new Set<number>();
         swapped = true;
       }
     }
-    if(!swapped) {
-      break;
-    }
-
     sorted.add(upper);
     upper = upper - 1;
+
+    // if(!swapped) {
+    //   break;
+    // }
+
     swapped = false;
     for(let i = upper; i > lower; i--) {
       yield [i-1, i, sorted];
@@ -61,18 +61,12 @@ let sorted = new Set<number>();
         swapped = true;
       }
     }
-    if(!swapped) {
-      break;
-    }
-
     sorted.add(lower);
     lower = lower + 1;
-  }
+  } while(swapped)
 
-  if(!swapped) {
-    for(let i = lower; i <= upper; i++) {
-      sorted.add(i);
-    }
+  for(let i = lower; i <= upper; i++) {
+    sorted.add(i);
   }
 
   yield [undefined, undefined, sorted];
