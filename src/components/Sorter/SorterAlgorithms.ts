@@ -4,7 +4,7 @@ export type SorterAlgorithmReturnType = [number | undefined, number | undefined,
 export type SorterAlgorithmGenerator = Generator<SorterAlgorithmReturnType>
 export type SorterAlgorithmType = (array: SorterArray) => SorterAlgorithmGenerator;
 
-function* bubbleSort(array: SorterArray): SorterAlgorithmGenerator {
+function* BubbleSort(array: SorterArray): SorterAlgorithmGenerator {
   const sorted = new Set<number>()
   const length = array.length;
 
@@ -27,7 +27,7 @@ function* bubbleSort(array: SorterArray): SorterAlgorithmGenerator {
   return;
 }
 
-function* cocktailShakerSort(array: SorterArray): SorterAlgorithmGenerator {
+function* CocktailShakerSort(array: SorterArray): SorterAlgorithmGenerator {
   let sorted = new Set<number>();
   const length = array.length;
 
@@ -74,7 +74,7 @@ function* cocktailShakerSort(array: SorterArray): SorterAlgorithmGenerator {
   return
 }
 
-function* selectionSort(array: SorterArray): SorterAlgorithmGenerator {
+function* SelectionSort(array: SorterArray): SorterAlgorithmGenerator {
   const sorted = new Set<number>();
   const length = array.length;
 
@@ -99,7 +99,7 @@ function* selectionSort(array: SorterArray): SorterAlgorithmGenerator {
   return
 }
 
-function* insertionSort(array: SorterArray): SorterAlgorithmGenerator {
+function* InsertionSort(array: SorterArray): SorterAlgorithmGenerator {
   const sorted = new Set<number>();
   const length = array.length;
 
@@ -124,7 +124,7 @@ function* insertionSort(array: SorterArray): SorterAlgorithmGenerator {
   return;
 }
 
-function* quickSort(array: SorterArray): SorterAlgorithmGenerator {
+function* QuickSort(array: SorterArray): SorterAlgorithmGenerator {
   const sorted = new Set<number>();
   const length = array.length;
 
@@ -169,10 +169,59 @@ function* quickSort(array: SorterArray): SorterAlgorithmGenerator {
   return;
 }
 
+function* HeapSort(array: SorterArray): SorterAlgorithmGenerator {
+  const sorted = new Set<number>();
+  const length = array.length;
+
+  if(length <= 0) return;
+
+  function* shiftDown(start: number, end: number): SorterAlgorithmGenerator {
+    let root = start;
+    let child;
+
+    while((child = 2 * root + 1) <= end) {
+      let swap = root;
+      yield [swap, child, sorted];
+      if(array.compare(swap, child)) {
+        swap = child;
+      }
+      yield [swap, child+1, sorted];
+      if(child+1 <= end && array.compare(swap, child + 1)) {
+        swap = child + 1;
+      }
+      if(swap === root) {
+        return;
+      } else {
+        array.swap(root, swap);
+        root = swap;
+      }
+    }
+  }
+  function* heapify() {
+    for(let start = Math.floor((length-2) / 2); start >= 0; start--) {
+      yield* shiftDown(start, length - 1);
+    }
+  }
+
+  yield* heapify();
+
+  for(let end = length - 1; end > 0; end--) {
+    array.swap(end, 0);
+    sorted.add(end);
+    yield* shiftDown(0, end-1);
+  }
+  
+  sorted.add(0);
+  yield [undefined, undefined, sorted];
+
+  return;
+}
+
 export const algorithms = {
-  BubbleSort: bubbleSort,
-  CocktailShakerSort: cocktailShakerSort,
-  SelectionSort: selectionSort,
-  InsertionSort: insertionSort,
-  QuickSort: quickSort,
+  BubbleSort,
+  CocktailShakerSort,
+  SelectionSort,
+  InsertionSort,
+  QuickSort,
+  HeapSort,
 }
