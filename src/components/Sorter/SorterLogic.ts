@@ -6,24 +6,22 @@ export class SorterLogic {
   static readonly compareFn = (i: number, j: number) => i < j;
   static readonly minDelay = 10;
 
-  private delay: number;
-  private trueDelay: number;
+
+  private trueDelay: number = SorterLogic.minDelay;
+  private delay: number = this.trueDelay;
 
   private generator: SorterAlgorithmGenerator;
-  private values: SorterArray = new SorterArray([], () => true);
+  private values: SorterArray;
   private indidcesSorted: number[] = [];
   private lastCompared: [number | undefined, number | undefined] = [undefined, undefined];
 
   private step = 0;
 
-  private t0 = 0;
-  private t1 = 0;
-  private timeElapsedT0 = 0;
-  private timeElapsed = 0;
   private sleepTime = 0;
   private realTime = 0;
 
-  private timeout: NodeJS.Timeout | undefined;
+  private timeout = 0;
+  private running = false;
 
   private updated = false;
 
@@ -31,8 +29,7 @@ export class SorterLogic {
     this.values = new SorterArray(data, SorterLogic.compareFn);
     this.generator = algorithms.BubbleSort(this.values);
 
-    this.delay = Math.max(delay, 0);
-    this.trueDelay = Math.max(SorterLogic.minDelay, this.delay);
+    this.setDelay(delay);
 
     this.loop = this.loop.bind(this);
   }
@@ -53,39 +50,45 @@ export class SorterLogic {
     return !next.done;
   }
 
-  loop() {
-    this.t1 = performance.now();
-    this.sleepTime = this.sleepTime + this.t1 - this.t0;
+  private loop() {
+    const t0 = performance.now();
+
+    this.sleepTime = this.sleepTime + this.trueDelay;
 
     let hasNext;
-
     do {
       hasNext = this.runNext();
       this.step = this.step + 1;
     } while(hasNext && this.sleepTime > this.delay * this.step)
 
-    if(hasNext) {
-      this.timeout = setTimeout(this.loop, this.trueDelay);
+    if(!hasNext) {
+      this.pause();
     }
 
-    this.t0 = performance.now();
-    this.realTime = this.realTime + this.t0 - this.t1; 
+    this.realTime = this.realTime + performance.now() - t0; 
   }
 
   start() {
-    this.t0 = performance.now();
-    this.timeElapsedT0 = this.t0 - this.timeElapsed;
-    this.loop();
+    if(!this.running)
+    {
+      this.timeout = window.setInterval(this.loop, this.trueDelay);
+      this.running = true;
+    }
   }
 
   pause() {
-    if(this.timeout) {
-      clearTimeout(this.timeout);
+    if(this.running) {
+      clearInterval(this.timeout);
+      this.running = false;
     }
   }
 
   didUpdate() {
     return this.updated;
+  }
+
+  isRunning() {
+    return this.running;
   }
 
   getSleepTime() {
@@ -134,5 +137,15 @@ export class SorterLogic {
       this.getComparisons(),
       this.getAccesses(),
     ];
+  }
+
+  setDelay(delay: number) {
+    this.delay = Math.max(delay, 0);
+    this.trueDelay = Math.max(SorterLogic.minDelay, this.delay);
+
+    if(this.running) {
+      this.pause();
+      this.start();
+    }
   }
 }
