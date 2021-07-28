@@ -246,6 +246,40 @@ function* ShellSort(array: SorterArray): SorterAlgorithmGenerator {
   return;
 }
 
+function* CombSort(array: SorterArray): SorterAlgorithmGenerator {
+  const sorted = new Set<number>();
+  const length = array.length;
+
+  if(length <= 0) return;
+
+  let gap = length;
+  const shrink = 1.3;
+  let isSorted = false;
+
+  while(isSorted === false) {
+    gap = Math.floor(gap / shrink);
+
+    if(gap <= 1) {
+      gap = 1;
+      isSorted = true;
+    }
+
+    for(let i = 0; i + gap < length; i++) {
+      yield [i, i + gap, sorted];
+      if(!array.compare(i, i + gap)) {
+        array.swap(i, i + gap);
+        isSorted = false;
+      }
+    }
+  }
+
+  for(let i = 0; i < length; i++) {sorted.add(i)}
+  
+  yield [undefined, undefined, sorted];
+
+  return;
+}
+
 export const algorithms = {
   BubbleSort,
   CocktailShakerSort,
@@ -254,4 +288,5 @@ export const algorithms = {
   QuickSort,
   HeapSort,
   ShellSort,
+  CombSort,
 }
