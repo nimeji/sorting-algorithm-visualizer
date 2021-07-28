@@ -36,14 +36,15 @@ function* insertionSort(array: SorterArray): SorterAlgorithmGenerator {
   sorted = [0]
 
   for(let i = 1; i < length; i++) {
+    sorted = [...sorted, i];
     for(let j = i - 1; j >= 0; j--) {
       yield [j, j+1, sorted];
       if(!array.compare(j, j+1)) {
         array.swap(j, j+1);
+      } else {
+        break;
       }
     }
-
-    sorted = [...sorted, i];
   }
   
   yield [undefined, undefined, sorted];
