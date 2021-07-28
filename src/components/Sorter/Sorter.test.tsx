@@ -1,27 +1,26 @@
 import { mount, ReactWrapper } from 'enzyme';
 import { SorterValue } from '../SorterValue/SorterValue';
 import { Sorter, SorterProps } from './Sorter';
+import { SorterLogic } from './SorterLogic';
+
 
 describe('Sorter', () => {
-  let wrapper: ReactWrapper<typeof Sorter, SorterProps, {}>
+  let wrapper: ReactWrapper<SorterProps, any, Sorter>;
   const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
-  const length = data.length;
+  const length = 10;
+  const sorted = [0, 1, 2, length - 1];
+  const compared: [number, number] = [0, 3];
+  const comparisons = 123;
+  const accesses = 456;
+  const time = 123.456;
 
-  describe('after mounting', () => {
+  describe('without mocked SorterLogic', () => {
     beforeEach(() => {
-      wrapper = mount(<Sorter data={data} delay={0} />)
+      wrapper = mount(<Sorter data={data} delay={0} />);
     });
   
     it('renders correct number of SorterValues', () => {
       expect(wrapper.find(SorterValue).length).toBe(length);
-    });
-  
-    it('has a valid height for each SorterValue', () => {
-      wrapper.find(SorterValue).forEach(element => {
-        const height = element.prop('height');
-        expect(height).toBeGreaterThanOrEqual(0);
-        expect(height).toBeLessThanOrEqual(100);
-      });
     });
   
     it('has correct width for each SorterValue', () => {
@@ -29,62 +28,63 @@ describe('Sorter', () => {
         expect(element.prop('width')).toBe(100/length);  
       });
     });
-  })
+  
+    it('has correct height for each SorterValue', () => {
+      wrapper.find(SorterValue).forEach((element, i) => {
+        expect(element.prop('height')).toBe(data[i] * 100);
+      });
+    });
+  
+    it('has correct height for each SorterValue after prop change', () => {
+      const reverseData = [...data].reverse();
+  
+      wrapper.setProps({
+        data: reverseData,
+      });
+      
+      wrapper.update();
+  
+      wrapper.find(SorterValue).forEach((element, i) => {
+        expect(element.prop('height')).toBe(reverseData[i] * 100);
+      });
+    });
+  });
+  
+  describe('with mocked SorterLogic', () => {
+    beforeEach(() => {
+      jest.spyOn(SorterLogic.prototype, 'getLastState').mockReturnValue([data, sorted, compared, comparisons, accesses]);
+      jest.spyOn(SorterLogic.prototype, 'getSleepTime').mockReturnValue(time);
+      jest.spyOn(SorterLogic.prototype, 'getRealTime').mockReturnValue(time);
+      
+      wrapper = mount(<Sorter data={data} delay={0} />);
+    });
+
+    it('shows the correct SorterValues as Sorted', () => {
+      wrapper.find(SorterValue).forEach((element, i) => {
+        expect(element.prop('sorted')).toBe(sorted.includes(i));
+      });
+    });
+  
+    it('shows the correct SorterValues as selected', () => {
+      wrapper.find(SorterValue).forEach((element, i) => {
+        expect(element.prop('selected')).toBe(compared.includes(i));
+      });
+    });
+  
+    it('shows comparisons correctly', () => {
+      expect(wrapper.find('#comparisons').text()).toBe(comparisons.toString());
+    });
+  
+    it('shows accesses correctly', () => {
+      expect(wrapper.find('#accesses').text()).toBe(accesses.toString());
+    });
+  
+    it('shows sleepTime correctly', () => {
+      expect(wrapper.find('#sleep-time').text()).toBe(time.toFixed(wrapper.prop('decimals')));
+    });
+  
+    it('shows realTime correctly', () => {
+      expect(wrapper.find('#real-time').text()).toBe(time.toFixed(wrapper.prop('decimals')));
+    });
+  });
 });
-
-
-
-// describe('Sorter after sorting', () => {
-//   let wrapper: ReactWrapper<typeof Sorter, SorterProps, {}>
-
-//   beforeAll(() => {
-//     throw new Error();
-
-//     const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
-//     wrapper = mount(<Sorter data={data} delay={0} />);
-
-//     let i = 100;
-//     while(wrapper.find('button').prop('disabled') === false && i--) {
-//       wrapper.find('button').simulate('click');
-//     }
-//   });
-
-//   it('results in a sorted list', () => {
-//     const values = wrapper.find(SorterValue);
-
-//     for(let i=0; i < values.length - 1; i++) {
-//       expect(values.at(i).prop('height')).toBeLessThanOrEqual(values.at(i+1).prop('height'))
-//     }    
-//   });
-
-//   it('marks the list as sorted', () => {
-//     const values = wrapper.find(SorterValue);
-//     for(let i=0; i < values.length; i++) {
-//       expect(values.at(i).prop('sorted')).toBeTruthy();
-//     }    
-//   });
-
-//   it('displays a non zero time after sorting', () => {
-//     const value = parseInt(wrapper.find('#real-time').find('span').text());
-//     expect(value).not.toBeNaN();
-//     expect(value).toBeGreaterThan(0);
-//   });
-
-//   it('displays non zero array accesses after sorting', () => {
-//     const value = parseInt(wrapper.find('#accesses').find('span').text());
-//     expect(value).not.toBeNaN();
-//     expect(value).toBeGreaterThan(0);
-//   });
-
-//   it('displays non zero comparisons after sorting', () => {
-//     const value = parseInt(wrapper.find('#comparisions').find('span').text());
-//     expect(value).not.toBeNaN();
-//     expect(value).toBeGreaterThan(0);
-//   });
-
-//   it('displays a positive sleep time after sorting', () => {
-//     const value = parseInt(wrapper.find('#sleep-time').find('span').text());
-//     expect(value).not.toBeNaN();
-//     expect(value).toBeGreaterThanOrEqual(0);
-//   })
-// });
