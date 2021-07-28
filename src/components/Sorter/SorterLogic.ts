@@ -23,6 +23,8 @@ export class SorterLogic {
   private sleepTime = 0;
   private realTime = 0;
 
+  private timeout: NodeJS.Timeout | undefined;
+
   private updated = false;
 
   constructor(data: number[], delay: number) {
@@ -63,7 +65,7 @@ export class SorterLogic {
     } while(hasNext && this.sleepTime > this.delay * this.step)
 
     if(hasNext) {
-      setTimeout(this.loop, this.trueDelay);
+      this.timeout = setTimeout(this.loop, this.trueDelay);
     }
 
     this.t0 = performance.now();
@@ -74,6 +76,12 @@ export class SorterLogic {
     this.t0 = performance.now();
     this.timeElapsedT0 = this.t0 - this.timeElapsed;
     this.loop();
+  }
+
+  pause() {
+    if(this.timeout) {
+      clearTimeout(this.timeout);
+    }
   }
 
   didUpdate() {

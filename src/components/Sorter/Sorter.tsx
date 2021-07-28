@@ -23,6 +23,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
     updateInterval: 1000/24,
   }
 
+  private timeout: NodeJS.Timeout | undefined;
   private static minUpdateInterval = 50;
 
   constructor(props: SorterProps) {
@@ -34,6 +35,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
     };
 
     this.start = this.start.bind(this);
+    this.pause = this.pause.bind(this);
   }
 
   componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
@@ -47,7 +49,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
   start() {
     this.state.logic.start();
 
-    setInterval(() => {
+    this.timeout = setInterval(() => {
       if(this.state.logic.didUpdate()) {
         this.forceUpdate();
       }
@@ -56,6 +58,18 @@ export class Sorter extends Component<SorterProps, SorterState> {
     this.setState({
       buttonDisabled: true,
     })
+  }
+
+  pause() {
+    this.state.logic.pause();
+
+    if(this.timeout) {
+      clearTimeout(this.timeout);
+    }
+
+    this.setState({
+      buttonDisabled: false,
+    });
   }
 
   render() {
@@ -85,16 +99,19 @@ export class Sorter extends Component<SorterProps, SorterState> {
           {elements}
         </div>
         <div className={styles.Metrics}>
-          <div id="comparisions">Comparisons: <span>{comparisons}</span></div>
-          <div id="accesses">Array Accesses: <span>{accesses}</span></div>
-          <div id="real-time">Real Time: <span>{logic.getRealTime().toFixed(decimals)}</span>ms</div>
-          <div id="sleep-time">Sleep Time: <span>{logic.getSleepTime().toFixed(decimals)}</span>ms</div>
+          <div>Comparisons: <span id="comparisons">{comparisons}</span></div>
+          <div>Array Accesses: <span id="accesses">{accesses}</span></div>
+          <div>Real Time: <span id="real-time">{logic.getRealTime().toFixed(decimals)}</span>ms</div>
+          <div>Sleep Time: <span id="sleep-time">{logic.getSleepTime().toFixed(decimals)}</span>ms</div>
         </div>
 
         <button 
           onClick={this.start}
           disabled={buttonDisabled}
         >Start</button>
+        <button
+          onClick={this.pause}
+        >Pause</button>
       </div>
     );
   }
