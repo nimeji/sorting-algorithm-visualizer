@@ -60,7 +60,7 @@ describe('Sorter', () => {
     beforeEach(() => {
       jest.spyOn(SorterLogic.prototype, 'getLastState').mockReturnValue({
         values: [...data], 
-        indicesSorted: [...sorted], 
+        indicesSorted: new Set(sorted), 
         lastCompared: [...compared], 
         comparisons, 
         accesses

@@ -105,7 +105,7 @@ export class SorterLogic {
   }
 
   getIndicesSorted() {
-    return new Set(this.indidcesSorted);
+    return this.indidcesSorted;
   }
 
   getValues() {

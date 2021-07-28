@@ -5,7 +5,7 @@ import { SorterArray } from './SorterArray';
 describe('SorterLogic', () => {
   let instance: SorterLogic;
   const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
-  const sorted = [1, 2, 3];
+  const sorted = new Set([1, 2, 3]);
   const compared = [1, 2];
   const iterations = 300;
 
@@ -110,7 +110,7 @@ describe('SorterLogic', () => {
       instance.runNext();
 
       instance.getIndicesSorted().forEach((element, i) => {
-        expect(element).toBe(sorted[i]);
+        expect(sorted.has(element)).toBeTruthy();
       });
     });
 
@@ -192,9 +192,7 @@ describe('SorterLogic', () => {
       }
 
       const indicesSorted2 = instance.getIndicesSorted();
-      for(let i = 0; i < indicesSorted.length; i++) {
-        expect(indicesSorted[i]).toBe(indicesSorted2[i]);
-      }
+      indicesSorted.forEach(element => expect(indicesSorted2.has(element)).toBeTruthy());
 
       const lastCompared2 = instance.getLastCompared();
       expect(lastCompared[0]).toBe(lastCompared2[0]);
