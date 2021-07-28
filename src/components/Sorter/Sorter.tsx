@@ -94,7 +94,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
     const { decimals } = this.props;
 
-    const [values, sorted, lastCompared, comparisons, accesses] = logic.getLastState();
+    const {values, indicesSorted, lastCompared, comparisons, accesses} = logic.getLastState();
 
     const elements = [];
     for(let i = 0; i < values.length; i++) {
@@ -103,7 +103,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
         height={values[i] * 100} 
         width={100/values.length} 
         selected={lastCompared.includes(i)}
-        sorted={sorted.includes(i)}
+        sorted={indicesSorted.includes(i)}
       />
     }
 

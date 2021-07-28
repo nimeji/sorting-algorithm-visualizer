@@ -127,16 +127,16 @@ export class SorterLogic {
     return this.values.accesses;
   }
 
-  getLastState(): [number[], number[], [number | undefined, number | undefined], number, number] {
+  getLastState() {
     this.updated = false;
 
-    return [
-      this.getValues(),
-      this.getIndicesSorted(),
-      this.getLastCompared(),
-      this.getComparisons(),
-      this.getAccesses(),
-    ];
+    return {
+      values: this.getValues(),
+      indicesSorted: this.getIndicesSorted(),
+      lastCompared: this.getLastCompared(),
+      comparisons: this.getComparisons(),
+      accesses: this.getAccesses(),
+    };
   }
 
   setDelay(delay: number) {

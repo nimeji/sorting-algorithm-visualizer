@@ -57,7 +57,13 @@ describe('Sorter', () => {
     let mockUpdate: jest.SpyInstance;
 
     beforeEach(() => {
-      jest.spyOn(SorterLogic.prototype, 'getLastState').mockReturnValue([data, sorted, compared, comparisons, accesses]);
+      jest.spyOn(SorterLogic.prototype, 'getLastState').mockReturnValue({
+        values: [...data], 
+        indicesSorted: [...sorted], 
+        lastCompared: [...compared], 
+        comparisons, 
+        accesses
+      });
       jest.spyOn(SorterLogic.prototype, 'getSleepTime').mockReturnValue(time);
       jest.spyOn(SorterLogic.prototype, 'getRealTime').mockReturnValue(time);
       mockStart = jest.spyOn(SorterLogic.prototype, 'start').mockImplementation(()=>{});
@@ -115,12 +121,11 @@ describe('Sorter', () => {
 
     it('continues sorting after pause', () => {
       instance.start();
-      jest.advanceTimersToNextTimer(10);
       instance.pause();
       instance.start();
       jest.advanceTimersToNextTimer(10);
 
-      expect(mockUpdate).toHaveBeenCalledTimes(20);
+      expect(mockUpdate).toHaveBeenCalledTimes(10);
     });
 
     // it('resets after calling reset', () => {

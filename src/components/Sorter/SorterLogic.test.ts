@@ -184,16 +184,16 @@ describe('SorterLogic', () => {
     it('returns the correct state', () => {
       instance.runNext();
 
-      const [values, sorted, lastCompared, comparisons, accesses] = instance.getLastState();
+      const { values, indicesSorted, lastCompared, comparisons, accesses } = instance.getLastState();
       
       const values2 = instance.getValues();
       for(let i = 0; i < values.length; i++) {
         expect(values[i]).toBe(values2[i]);
       }
 
-      const sorted2 = instance.getIndicesSorted();
-      for(let i = 0; i < sorted.length; i++) {
-        expect(sorted[i]).toBe(sorted2[i]);
+      const indicesSorted2 = instance.getIndicesSorted();
+      for(let i = 0; i < indicesSorted.length; i++) {
+        expect(indicesSorted[i]).toBe(indicesSorted2[i]);
       }
 
       const lastCompared2 = instance.getLastCompared();
