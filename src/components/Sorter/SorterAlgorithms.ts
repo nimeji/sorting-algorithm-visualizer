@@ -27,6 +27,31 @@ function* bubbleSort(array: SorterArray): SorterAlgorithmGenerator {
   return;
 }
 
+function* selectionSort(array: SorterArray): SorterAlgorithmGenerator {
+  let sorted: number[] = [];
+  const length = array.length;
+
+  if(length <= 0) return;
+
+  for(let i = 0; i < length; i++) {
+    let best = i;
+    for(let j = i + 1; j < length; j++) {
+      yield [best, j, sorted];
+      if(!array.compare(best, j)) {
+        best = j;
+      }
+    }
+
+    if(best !== i) {
+      array.swap(i, best);
+    }
+    sorted = [...sorted, i];
+  }
+  yield [undefined, undefined, sorted];
+
+  return
+}
+
 function* insertionSort(array: SorterArray): SorterAlgorithmGenerator {
   let sorted;
   const length = array.length;
@@ -54,5 +79,6 @@ function* insertionSort(array: SorterArray): SorterAlgorithmGenerator {
 
 export const algorithms = {
   BubbleSort: bubbleSort,
+  SelectionSort: selectionSort,
   InsertionSort: insertionSort,
 }
