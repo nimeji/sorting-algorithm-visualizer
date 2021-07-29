@@ -228,12 +228,12 @@ function* ShellSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgor
         }
       }
       if(gap === 1) {
-        indicesSorted.add(i);
+        indicesSorted.add(i-1);
       }
     }
   }
 
-  indicesSorted.add(0);
+  indicesSorted.add(length-1);
   yield [undefined, undefined];
 
   return;
