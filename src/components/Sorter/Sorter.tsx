@@ -10,6 +10,7 @@ type SorterProps = {
   algorithm?: AlgorithmNames;
   sleepTime?: number,
   run?: boolean,
+  border?: number;
   defaultColor?: string;
   comparedColor?: string;
   sortedColor?: string;
@@ -20,6 +21,7 @@ export function Sorter ({
   algorithm = 'BubbleSort', 
   sleepTime = 100, 
   run = false,
+  border = 0.5,
   defaultColor = 'lightblue',
   comparedColor = 'darkblue',
   sortedColor = 'green',
@@ -46,12 +48,24 @@ export function Sorter ({
     if(logic) {
       const width = ctx.canvas.width;
       const height = ctx.canvas.height;
+      const borderWidth = Math.ceil(Math.max(width, height) / 100 * border)
+      const innerWidth = width - 2 * borderWidth;
+      const innerHeight = height - 2 * borderWidth;
+
       ctx.clearRect(0, 0, width, height);
 
       const {values, lastCompared, indicesSorted} = logic.getLastState();
 
-      const elementWidth = Math.floor(width / values.length);
+      const elementWidth = Math.floor(innerWidth / values.length);
       const offset = (width - elementWidth * values.length) / 2;
+
+      if(borderWidth > 0)
+      {
+        ctx.lineWidth = borderWidth;
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(offset - borderWidth * 0.5, borderWidth * 0.5, width - 2 * offset + borderWidth, innerHeight + borderWidth);
+      }
+
 
       values.forEach((value, i) => {
         let color = defaultColor;
@@ -60,11 +74,12 @@ export function Sorter ({
         if(lastCompared.includes(i)) color = comparedColor;
 
         ctx.fillStyle = color;
-        ctx.fillRect(offset + elementWidth * i, height-height*value, elementWidth, height*value)
+        ctx.fillRect(offset + elementWidth * i, innerHeight + borderWidth - innerHeight*value, elementWidth, innerHeight*value)
       });
+
     }
 
-  }, [logic, defaultColor, comparedColor, sortedColor]);
+  }, [logic, border, defaultColor, comparedColor, sortedColor]);
 
   return (
     <div className={styles.sorter}>
