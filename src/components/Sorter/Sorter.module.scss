@@ -1,16 +1,4 @@
-.Container {
-  position: relative
-}
-
-.ValueContainer {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: flex-end;
-  height: 500px;
-}
-
-.Metrics {
-  position: absolute;
-  top: 0;
-  left: 0;
+.sorter {
+  width: 100%;
+  height: 800px;
 }

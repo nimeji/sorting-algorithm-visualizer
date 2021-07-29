@@ -1,154 +1,73 @@
-import styles from './Sorter.module.scss';
+import { useEffect, useState } from "react";
+import { useCallback } from "react";
+import { Canvas } from "../Canvas/Canvas";
+import { AlgorithmNames } from "./SorterAlgorithms";
+import { SorterLogic } from "./SorterLogic";
+import styles from './Sorter2.module.scss';
 
-import { SorterValue } from "../SorterValue/SorterValue";
-import { Component } from 'react';
-import { SorterLogic } from './SorterLogic';
-import { algorithms } from './SorterAlgorithms';
-
-export type SorterProps = {
-  algorithm: keyof typeof algorithms;
+type Sorter2Props = {
   data: number[];
-  decimals?: number;
-  delay: number;
-  updateInterval: number;
-}
+  algorithm?: AlgorithmNames;
+  sleepTime?: number,
+  run?: boolean,
+  defaultColor?: string;
+  comparedColor?: string;
+  sortedColor?: string;
+};
 
-type SorterState = {
-  buttonDisabled: boolean;
-  logic: SorterLogic;
-}
+export function Sorter2 ({
+  data, 
+  algorithm = 'BubbleSort', 
+  sleepTime = 100, 
+  run = false,
+  defaultColor = 'lightblue',
+  comparedColor = 'darkblue',
+  sortedColor = 'green',
+}: Sorter2Props) {
+  const [logic, setLogic] = useState<SorterLogic>();
 
-export class Sorter extends Component<SorterProps, SorterState> {
-  static defaultProps = {
-    algorithm: 'BubbleSort',
-    decimals: 1,
-    delay: 100,
-    updateInterval: 1000/40,
-  }
+  useEffect(() => {
+    return () => {logic?.pause(); console.log('cleanup')}
+  }, [logic]);
 
-  private static minUpdateInterval = 50;
+  useEffect(() => {
+    setLogic(new SorterLogic(data, algorithm, sleepTime));
+  }, [data, algorithm, sleepTime]);
 
-  private timeout = 0;
-  private running = false;
-  private lastLoopTime = Date.now();
-
-  constructor(props: SorterProps) {
-    super(props);
-
-    this.state = {
-      buttonDisabled: false,
-      logic: new SorterLogic(props.data, this.props.algorithm, props.delay),
-    };
-
-    this.start = this.start.bind(this);
-    this.pause = this.pause.bind(this);
-    this.reset = this.reset.bind(this);
-  }
-
-  componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
-    if (prevProps.data !== this.props.data || prevProps.algorithm !== this.props.algorithm) {
-      this.reset();
+  useEffect(() => {
+    if(run) {
+      logic?.start();
+    } else {
+      logic?.pause();
     }
-  }
+  }, [logic, run]);
 
-  componentWillUnmount() {
-    this.pause();
-  }
+  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
+    if(logic) {
+      const width = ctx.canvas.width;
+      const height = ctx.canvas.height;
+      ctx.clearRect(0, 0, width, height);
 
-  update() {
-    if(this.state.logic.didUpdate()) {
-      this.forceUpdate();
-    }
-  }
+      const {values, lastCompared, indicesSorted} = logic.getLastState();
 
-  start() {
-    if(!this.running) {
-      this.state.logic.start();
-      this.timeout = window.setInterval(() => this.update(), Math.max(this.props.updateInterval, Sorter.minUpdateInterval));
-      this.running = true;
+      const elementWidth = ctx.canvas.width / values.length;
+
+      values.forEach((value, i) => {
+        let color = defaultColor;
+
+        if(indicesSorted.has(i)) color = sortedColor;
+        if(lastCompared.includes(i)) color = comparedColor;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(elementWidth * i, height-height*value, elementWidth * 1.05, height*value)
+      });
     }
 
-    this.setState({
-      buttonDisabled: true,
-    });
-  }
+  }, [logic, defaultColor, comparedColor, sortedColor]);
 
-  pause() {
-    if(this.running) {
-      this.state.logic.pause();
-      clearInterval(this.timeout);
-      this.running = false;
-    }
-
-    this.setState({
-      buttonDisabled: false,
-    });
-  }
-
-  reset() {
-    this.pause();
-
-    this.setState({
-      logic: new SorterLogic(this.props.data, this.props.algorithm, this.props.delay),
-    });
-  }
-
-  isRunning() {
-    return this.running;
-  }
-
-  render() {
-    const { 
-      buttonDisabled,
-      logic,
-    } = this.state;
-
-    const { decimals } = this.props;
-
-    const currentLoopTime = Date.now();
-    const currentFrameTime = currentLoopTime - this.lastLoopTime;
-    this.lastLoopTime = currentLoopTime;
-
-    const {values, indicesSorted, lastCompared, comparisons, accesses} = logic.getLastState();
-
-    const elements = [];
-    for(let i = 0; i < values.length; i++) {
-      elements[i] = <SorterValue 
-        key={i} 
-        height={values[i] * 100} 
-        width={100/values.length} 
-        selected={lastCompared.includes(i)}
-        sorted={indicesSorted.has(i)}
-      />
-    }
-
-    return (
-      <div className={styles.Container}>
-        <div className={styles.ValueContainer}>
-          {elements}
-        </div>
-        <div className={styles.Metrics}>
-          <div>Comparisons: <span id="comparisons">{comparisons}</span></div>
-          <div>Array Accesses: <span id="accesses">{accesses}</span></div>
-          <div>Real Time: <span id="real-time">{logic.getRealTime().toFixed(decimals)}</span>ms</div>
-          <div>Sleep Time: <span id="sleep-time">{logic.getSleepTime().toFixed(decimals)}</span>ms</div>
-          {this.running ? <div>FPS: <span>{(1000/currentFrameTime).toFixed(0)}</span></div> : undefined}
-        </div>
-
-        <button
-          id="btn-start"
-          onClick={this.start}
-          disabled={buttonDisabled}
-        >Start</button>
-        <button
-          id="btn-pause"
-          onClick={this.pause}
-        >Pause</button>
-        <button
-          id="btn-reset"
-          onClick={this.reset}
-        >Reset</button>
-      </div>
-    );
-  }
+  return (
+    <div className={styles.sorter}>
+      <Canvas draw={draw}/>
+    </div>
+  );
 }

@@ -1,173 +1,20 @@
-import { mount, ReactWrapper } from 'enzyme';
-import { SorterValue } from '../SorterValue/SorterValue';
-import { Sorter, SorterProps } from './Sorter';
-import { SorterLogic } from './SorterLogic';
+import { shallow, ShallowWrapper } from "enzyme";
+import { Canvas } from "../Canvas/Canvas";
+import { Sorter2 } from "./Sorter2";
 
 
-describe('Sorter', () => {
-  let wrapper: ReactWrapper<SorterProps, any, Sorter>;
-  let instance: Sorter;
+describe('Sorter2', () => {
   const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
-  const length = 10;
-  const sorted = [0, 1, 2, length - 1];
-  const compared: [number, number] = [0, 3];
-  const comparisons = 123;
-  const accesses = 456;
-  const time = 123.456;
-
-  describe('without mocked SorterLogic', () => {
-    beforeEach(() => {
-      wrapper = mount(<Sorter data={data} delay={0} />);
-    });
-  
-    it('renders correct number of SorterValues', () => {
-      expect(wrapper.find(SorterValue).length).toBe(length);
-    });
-  
-    it('has correct width for each SorterValue', () => {
-      wrapper.find(SorterValue).forEach(element => {
-        expect(element.prop('width')).toBe(100/length);  
-      });
-    });
-  
-    it('has correct height for each SorterValue', () => {
-      wrapper.find(SorterValue).forEach((element, i) => {
-        expect(element.prop('height')).toBe(data[i] * 100);
-      });
-    });
-  
-    it('has correct height for each SorterValue after prop change', () => {
-      const reverseData = [...data].reverse();
-  
-      wrapper.setProps({
-        data: reverseData,
-      });
-      
-      wrapper.update();
-  
-      wrapper.find(SorterValue).forEach((element, i) => {
-        expect(element.prop('height')).toBe(reverseData[i] * 100);
-      });
-    });
+  let wrapper: ShallowWrapper<typeof Sorter2>;
+  beforeAll(() => {
+    wrapper = shallow(<Sorter2 data={data} />);
   });
-  
-  describe('with mocked SorterLogic', () => {
-    let mockStart: jest.SpyInstance
-    let mockPause: jest.SpyInstance; 
-    let mockUpdate: jest.SpyInstance;
-    let mockForceUpdate: jest.SpyInstance;
 
-    beforeEach(() => {
-      jest.spyOn(SorterLogic.prototype, 'getLastState').mockReturnValue({
-        values: [...data], 
-        indicesSorted: new Set(sorted), 
-        lastCompared: [...compared], 
-        comparisons, 
-        accesses
-      });
-      jest.spyOn(SorterLogic.prototype, 'getSleepTime').mockReturnValue(time);
-      jest.spyOn(SorterLogic.prototype, 'getRealTime').mockReturnValue(time);
-      mockStart = jest.spyOn(SorterLogic.prototype, 'start').mockImplementation(()=>{});
-      mockPause = jest.spyOn(SorterLogic.prototype, 'pause').mockImplementation(()=>{});
+  it('renders the canvas', () => {
+    expect(wrapper.find(Canvas)).toHaveLength(1);
+  })
 
-      jest.useFakeTimers();
-
-      wrapper = mount(<Sorter data={data} delay={0} />);
-      instance = wrapper.instance();
-      mockUpdate = jest.spyOn(instance, 'update');
-      mockForceUpdate = jest.spyOn(instance, 'forceUpdate');
-    });
-
-    it('shows the correct SorterValues as Sorted', () => {
-      wrapper.find(SorterValue).forEach((element, i) => {
-        expect(element.prop('sorted')).toBe(sorted.includes(i));
-      });
-    });
-  
-    it('shows the correct SorterValues as selected', () => {
-      wrapper.find(SorterValue).forEach((element, i) => {
-        expect(element.prop('selected')).toBe(compared.includes(i));
-      });
-    });
-  
-    it('shows comparisons correctly', () => {
-      expect(wrapper.find('#comparisons').text()).toBe(comparisons.toString());
-    });
-  
-    it('shows accesses correctly', () => {
-      expect(wrapper.find('#accesses').text()).toBe(accesses.toString());
-    });
-  
-    it('shows sleepTime correctly', () => {
-      expect(wrapper.find('#sleep-time').text()).toBe(time.toFixed(wrapper.prop('decimals')));
-    });
-  
-    it('shows realTime correctly', () => {
-      expect(wrapper.find('#real-time').text()).toBe(time.toFixed(wrapper.prop('decimals')));
-    });
-
-    it('starts sorting when calling start', () => {
-      instance.start();
-      expect(mockStart).toHaveBeenCalled();
-      jest.advanceTimersToNextTimer(5);
-      expect(mockUpdate).toHaveBeenCalledTimes(5);
-    });
-
-    it('pauses sorting when calling pause', () => {
-      instance.start();
-      instance.pause();
-      jest.advanceTimersToNextTimer(10);
-      expect(mockPause).toHaveBeenCalled();
-      expect(mockUpdate).not.toHaveBeenCalled();
-    });
-
-    it('doesnt call start when already started', () => {
-      instance.start();
-      instance.start();
-      expect(mockStart).toHaveBeenCalledTimes(1);
-    });
-
-    it('doesnt call pause when already paused', () => {
-      instance.start();
-      instance.pause();
-      instance.pause();
-
-      expect(mockPause).toHaveBeenCalledTimes(1);
-    });
-
-    it('continues sorting after pause', () => {
-      instance.start();
-      instance.pause();
-      instance.start();
-      jest.advanceTimersToNextTimer(10);
-
-      expect(mockUpdate).toHaveBeenCalledTimes(10);
-    });
-
-    it('indicates correctly whether it is running', () => {
-      expect(instance.isRunning()).toBeFalsy();
-      instance.start();
-      expect(instance.isRunning()).toBeTruthy();
-      instance.pause();
-      expect(instance.isRunning()).toBeFalsy();
-    });
-
-    it('resets after calling reset', () => {
-      const prevLogic = instance.state.logic;
-      wrapper.instance().reset();
-      expect(instance.isRunning()).toBeFalsy();
-      expect(instance.state.logic).not.toBe(prevLogic);
-    });
-
-    it('doesnt call forceUpdate when there is no update', () => {
-      instance.update();
-      expect(mockForceUpdate).not.toBeCalled();
-    });
-
-    it('calls forceUpdate when there is an update', () => {
-      jest.spyOn(SorterLogic.prototype, 'didUpdate').mockReturnValue(true);
-      instance.update();
-      expect(mockForceUpdate).toHaveBeenCalled();
-    });
+  it('passes a draw function to the canvas', ()=>{
+    expect(typeof wrapper.find(Canvas).props().draw).toBe('function');
   });
 });
