@@ -23,13 +23,14 @@ export class Sorter extends Component<SorterProps, SorterState> {
     algorithm: 'BubbleSort',
     decimals: 1,
     delay: 100,
-    updateInterval: 1000/24,
+    updateInterval: 1000/40,
   }
 
   private static minUpdateInterval = 50;
 
   private timeout = 0;
   private running = false;
+  private lastLoopTime = Date.now();
 
   constructor(props: SorterProps) {
     super(props);
@@ -48,6 +49,10 @@ export class Sorter extends Component<SorterProps, SorterState> {
     if (prevProps.data !== this.props.data || prevProps.algorithm !== this.props.algorithm) {
       this.reset();
     }
+  }
+
+  componentWillUnmount() {
+    this.pause();
   }
 
   update() {
@@ -100,6 +105,10 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
     const { decimals } = this.props;
 
+    const currentLoopTime = Date.now();
+    const currentFrameTime = currentLoopTime - this.lastLoopTime;
+    this.lastLoopTime = currentLoopTime;
+
     const {values, indicesSorted, lastCompared, comparisons, accesses} = logic.getLastState();
 
     const elements = [];
@@ -123,6 +132,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
           <div>Array Accesses: <span id="accesses">{accesses}</span></div>
           <div>Real Time: <span id="real-time">{logic.getRealTime().toFixed(decimals)}</span>ms</div>
           <div>Sleep Time: <span id="sleep-time">{logic.getSleepTime().toFixed(decimals)}</span>ms</div>
+          {this.running ? <div>FPS: <span>{(1000/currentFrameTime).toFixed(0)}</span></div> : undefined}
         </div>
 
         <button
