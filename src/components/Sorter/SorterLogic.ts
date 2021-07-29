@@ -28,7 +28,7 @@ export class SorterLogic {
   constructor(data: number[], algorithm: keyof typeof algorithms, delay: number) {
     this.values = new SorterArray(data, SorterLogic.compareFn);
 
-    this.generator = algorithms[algorithm](this.values);
+    this.generator = algorithms[algorithm](this.values, this.indidcesSorted);
 
     this.setDelay(delay);
 
@@ -39,10 +39,9 @@ export class SorterLogic {
     const next = this.generator.next();
 
     if(!next.done){
-      const [i, j, sorted] = next.value;
+      const [i, j] = next.value;
 
       this.lastCompared = [i, j];
-      this.indidcesSorted = sorted;
       this.updated = true;
     } else {
       this.lastCompared = [undefined, undefined];

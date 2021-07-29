@@ -1,11 +1,10 @@
 import { SorterArray } from "./SorterArray";
 
-export type SorterAlgorithmReturnType = [number | undefined, number | undefined, Set<number>];
+export type SorterAlgorithmReturnType = [number | undefined, number | undefined];
 export type SorterAlgorithmGenerator = Generator<SorterAlgorithmReturnType>
-export type SorterAlgorithmType = (array: SorterArray) => SorterAlgorithmGenerator;
+export type SorterAlgorithmType = (array: SorterArray, indicesSorted: Set<number>) => SorterAlgorithmGenerator;
 
-function* BubbleSort(array: SorterArray): SorterAlgorithmGenerator {
-  const sorted = new Set<number>()
+function* BubbleSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
 
   if(length <= 0) return;
@@ -13,22 +12,21 @@ function* BubbleSort(array: SorterArray): SorterAlgorithmGenerator {
   for(let i = 0; i < length - 1; i++) {
     let j;
     for(j = 0; j < length - 1 - i; j++) {
-      yield [j, j+1, sorted];
+      yield [j, j+1];
 
       if(!array.compare(j, j+1)) {
         array.swap(j, j+1);
       }
     }
-    sorted.add(j);
+    indicesSorted.add(j);
   }
-  sorted.add(0);
-  yield [undefined, undefined, sorted];
+  indicesSorted.add(0);
+  yield [undefined, undefined];
 
   return;
 }
 
-function* CocktailShakerSort(array: SorterArray): SorterAlgorithmGenerator {
-  let sorted = new Set<number>();
+function* CocktailShakerSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
 
   if(length <= 0) return;
@@ -40,13 +38,13 @@ function* CocktailShakerSort(array: SorterArray): SorterAlgorithmGenerator {
   do {
     swapped = false;
     for(let i = lower; i < upper; i++) {
-      yield [i, i+1, sorted];
+      yield [i, i+1];
       if(!array.compare(i, i+1)) {
         array.swap(i, i+1);
         swapped = true;
       }
     }
-    sorted.add(upper);
+    indicesSorted.add(upper);
     upper = upper - 1;
 
     // if(!swapped) {
@@ -55,27 +53,26 @@ function* CocktailShakerSort(array: SorterArray): SorterAlgorithmGenerator {
 
     swapped = false;
     for(let i = upper; i > lower; i--) {
-      yield [i-1, i, sorted];
+      yield [i-1, i];
       if(!array.compare(i-1, i)) {
         array.swap(i-1, i);
         swapped = true;
       }
     }
-    sorted.add(lower);
+    indicesSorted.add(lower);
     lower = lower + 1;
   } while(swapped)
 
   for(let i = lower; i <= upper; i++) {
-    sorted.add(i);
+    indicesSorted.add(i);
   }
 
-  yield [undefined, undefined, sorted];
+  yield [undefined, undefined];
 
   return
 }
 
-function* SelectionSort(array: SorterArray): SorterAlgorithmGenerator {
-  const sorted = new Set<number>();
+function* SelectionSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
 
   if(length <= 0) return;
@@ -83,7 +80,7 @@ function* SelectionSort(array: SorterArray): SorterAlgorithmGenerator {
   for(let i = 0; i < length; i++) {
     let best = i;
     for(let j = i + 1; j < length; j++) {
-      yield [best, j, sorted];
+      yield [best, j];
       if(!array.compare(best, j)) {
         best = j;
       }
@@ -92,25 +89,24 @@ function* SelectionSort(array: SorterArray): SorterAlgorithmGenerator {
     if(best !== i) {
       array.swap(i, best);
     }
-    sorted.add(i);
+    indicesSorted.add(i);
   }
-  yield [undefined, undefined, sorted];
+  yield [undefined, undefined];
 
   return
 }
 
-function* InsertionSort(array: SorterArray): SorterAlgorithmGenerator {
-  const sorted = new Set<number>();
+function* InsertionSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
 
   if(length <= 0) return;
 
-  sorted.add(0);
+  indicesSorted.add(0);
 
   for(let i = 1; i < length; i++) {
-    sorted.add(i);
+    indicesSorted.add(i);
     for(let j = i - 1; j >= 0; j--) {
-      yield [j, j+1, sorted];
+      yield [j, j+1];
       if(!array.compare(j, j+1)) {
         array.swap(j, j+1);
       } else {
@@ -119,13 +115,12 @@ function* InsertionSort(array: SorterArray): SorterAlgorithmGenerator {
     }
   }
   
-  yield [undefined, undefined, sorted];
+  yield [undefined, undefined];
 
   return;
 }
 
-function* QuickSort(array: SorterArray): SorterAlgorithmGenerator {
-  const sorted = new Set<number>();
+function* QuickSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
 
   if(length <= 0) return;
@@ -139,11 +134,11 @@ function* QuickSort(array: SorterArray): SorterAlgorithmGenerator {
       while(true) {
         do {
           i = i + 1;
-          yield [i, mid, sorted];
+          yield [i, mid];
         } while(array.compare(i, mid))
         do {
           j = j - 1;
-          yield [mid, j, sorted];
+          yield [mid, j];
         } while(array.compare(mid, j))
         if(i >= j) {
           break
@@ -159,18 +154,17 @@ function* QuickSort(array: SorterArray): SorterAlgorithmGenerator {
       yield* qs(lo, j);
       yield* qs(j+1, hi);
     } else {
-      sorted.add(lo);
+      indicesSorted.add(lo);
     }
   }
 
   yield* qs(0, length-1);
-  yield [undefined, undefined, sorted];
+  yield [undefined, undefined];
 
   return;
 }
 
-function* HeapSort(array: SorterArray): SorterAlgorithmGenerator {
-  const sorted = new Set<number>();
+function* HeapSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
 
   if(length <= 0) return;
@@ -181,11 +175,11 @@ function* HeapSort(array: SorterArray): SorterAlgorithmGenerator {
 
     while((child = 2 * root + 1) <= end) {
       let swap = root;
-      yield [swap, child, sorted];
+      yield [swap, child];
       if(array.compare(swap, child)) {
         swap = child;
       }
-      yield [swap, child+1, sorted];
+      yield [swap, child+1];
       if(child+1 <= end && array.compare(swap, child + 1)) {
         swap = child + 1;
       }
@@ -207,18 +201,17 @@ function* HeapSort(array: SorterArray): SorterAlgorithmGenerator {
 
   for(let end = length - 1; end > 0; end--) {
     array.swap(end, 0);
-    sorted.add(end);
+    indicesSorted.add(end);
     yield* shiftDown(0, end-1);
   }
 
-  sorted.add(0);
-  yield [undefined, undefined, sorted];
+  indicesSorted.add(0);
+  yield [undefined, undefined];
 
   return;
 }
 
-function* ShellSort(array: SorterArray): SorterAlgorithmGenerator {
-  const sorted = new Set<number>();
+function* ShellSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
   const gaps = [701, 301, 132, 57, 23, 10, 4, 1]
 
@@ -227,7 +220,7 @@ function* ShellSort(array: SorterArray): SorterAlgorithmGenerator {
   for(let gap of gaps) {
     for(let i = gap; i < length; i++) {
       for(let j = i; j >= gap; j -= gap) {
-        yield [j - gap, j, sorted];
+        yield [j - gap, j];
         if(!array.compare(j - gap, j)) {
           array.swap(j - gap, j);
         } else {
@@ -235,19 +228,18 @@ function* ShellSort(array: SorterArray): SorterAlgorithmGenerator {
         }
       }
       if(gap === 1) {
-        sorted.add(i);
+        indicesSorted.add(i);
       }
     }
   }
 
-  sorted.add(0);
-  yield [undefined, undefined, sorted];
+  indicesSorted.add(0);
+  yield [undefined, undefined];
 
   return;
 }
 
-function* CombSort(array: SorterArray): SorterAlgorithmGenerator {
-  const sorted = new Set<number>();
+function* CombSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
 
   if(length <= 0) return;
@@ -265,7 +257,7 @@ function* CombSort(array: SorterArray): SorterAlgorithmGenerator {
     }
 
     for(let i = 0; i + gap < length; i++) {
-      yield [i, i + gap, sorted];
+      yield [i, i + gap];
       if(!array.compare(i, i + gap)) {
         array.swap(i, i + gap);
         isSorted = false;
@@ -273,9 +265,9 @@ function* CombSort(array: SorterArray): SorterAlgorithmGenerator {
     }
   }
 
-  for(let i = 0; i < length; i++) {sorted.add(i)}
+  for(let i = 0; i < length; i++) {indicesSorted.add(i)}
   
-  yield [undefined, undefined, sorted];
+  yield [undefined, undefined];
 
   return;
 }
