@@ -50,7 +50,8 @@ export function Sorter ({
 
       const {values, lastCompared, indicesSorted} = logic.getLastState();
 
-      const elementWidth = ctx.canvas.width / values.length;
+      const elementWidth = Math.floor(width / values.length);
+      const offset = (width - elementWidth * values.length) / 2;
 
       values.forEach((value, i) => {
         let color = defaultColor;
@@ -59,7 +60,7 @@ export function Sorter ({
         if(lastCompared.includes(i)) color = comparedColor;
 
         ctx.fillStyle = color;
-        ctx.fillRect(elementWidth * i, height-height*value, elementWidth * 1.05, height*value)
+        ctx.fillRect(offset + elementWidth * i, height-height*value, elementWidth, height*value)
       });
     }
 
