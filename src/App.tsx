@@ -16,7 +16,7 @@ function App() {
 
   useEffect(() => {
     const temp = [];
-    const len = 200;
+    const len = 100;
     for(let i=0; i<len; i++) {
       temp[i] = 1/len * (i+1);
     }
@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div>
-      <Sorter data={data} delay={0}/>
+      <Sorter data={data} algorithm="QuickSort" run={true} sleepTime={10} />
     </div>
   );
 }

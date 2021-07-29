@@ -1,13 +1,13 @@
 import { shallow, ShallowWrapper } from "enzyme";
 import { Canvas } from "../Canvas/Canvas";
-import { Sorter2 } from "./Sorter2";
+import { Sorter } from "./Sorter";
 
 
-describe('Sorter2', () => {
+describe('Sorter', () => {
   const data = [0.6, 0.5, 0.4, 0.1, 0.8, 0.2, 1, 0.9, 0.71, 0.3];
-  let wrapper: ShallowWrapper<typeof Sorter2>;
+  let wrapper: ShallowWrapper<typeof Sorter>;
   beforeAll(() => {
-    wrapper = shallow(<Sorter2 data={data} />);
+    wrapper = shallow(<Sorter data={data} />);
   });
 
   it('renders the canvas', () => {

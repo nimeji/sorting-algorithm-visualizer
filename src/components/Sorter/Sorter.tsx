@@ -5,7 +5,7 @@ import { AlgorithmNames } from "./SorterAlgorithms";
 import { SorterLogic } from "./SorterLogic";
 import styles from './Sorter2.module.scss';
 
-type Sorter2Props = {
+type SorterProps = {
   data: number[];
   algorithm?: AlgorithmNames;
   sleepTime?: number,
@@ -15,7 +15,7 @@ type Sorter2Props = {
   sortedColor?: string;
 };
 
-export function Sorter2 ({
+export function Sorter ({
   data, 
   algorithm = 'BubbleSort', 
   sleepTime = 100, 
@@ -23,7 +23,7 @@ export function Sorter2 ({
   defaultColor = 'lightblue',
   comparedColor = 'darkblue',
   sortedColor = 'green',
-}: Sorter2Props) {
+}: SorterProps) {
   const [logic, setLogic] = useState<SorterLogic>();
 
   useEffect(() => {
