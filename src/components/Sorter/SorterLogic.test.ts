@@ -10,10 +10,10 @@ describe('SorterLogic', () => {
   const iterations = 300;
 
   beforeEach(() => {
-    jest.spyOn(algorithms, 'BubbleSort').mockImplementation(function* (array) {
+    jest.spyOn(algorithms, 'BubbleSort').mockImplementation(function* (array, indicesSorted) {
       let i = iterations;
       while(i--) {
-        yield [compared[0], compared[1], sorted];
+        yield [compared[0], compared[1]];
       }
       return;
     });
@@ -141,11 +141,32 @@ describe('SorterLogic', () => {
       expect(instance['generator'].next().done).toBeTruthy();
     });
 
+    it('indicates finished correctly', () => {
+      expect(instance.isFinished()).toBeFalsy();
+      instance.start();
+
+      let i = iterations + 1;
+      while(i--) {
+        expect(instance.isFinished()).toBeFalsy();
+        jest.advanceTimersToNextTimer();
+      }
+
+      expect(instance.isFinished()).toBeTruthy();
+    });
+
     it('indicates correctly whether the algorithm is running', () => {
       expect(instance.isRunning()).toBeFalsy();
       instance.start();
       expect(instance.isRunning()).toBeTruthy();
       instance.pause();
+      expect(instance.isRunning()).toBeFalsy();
+    });
+
+    it('does not restart after finishing', () => {
+      instance.start();
+      jest.runAllTimers();
+      expect(instance.isFinished()).toBeTruthy();
+      instance.start();
       expect(instance.isRunning()).toBeFalsy();
     });
 

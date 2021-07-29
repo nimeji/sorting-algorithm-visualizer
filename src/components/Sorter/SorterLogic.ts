@@ -24,6 +24,7 @@ export class SorterLogic {
   private running = false;
 
   private updated = false;
+  private finished = false;
 
   constructor(data: number[], algorithm: keyof typeof algorithms, delay: number) {
     this.values = new SorterArray(data, SorterLogic.compareFn);
@@ -63,13 +64,14 @@ export class SorterLogic {
 
     if(!hasNext) {
       this.pause();
+      this.finished = true;
     }
 
     this.realTime = this.realTime + performance.now() - t0; 
   }
 
   start() {
-    if(!this.running)
+    if(!this.finished && !this.running)
     {
       this.timeout = window.setInterval(this.loop, this.trueDelay);
       this.running = true;
@@ -89,6 +91,10 @@ export class SorterLogic {
 
   isRunning() {
     return this.running;
+  }
+
+  isFinished() {
+    return this.finished;
   }
 
   getSleepTime() {
