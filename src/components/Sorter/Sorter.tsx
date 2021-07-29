@@ -29,7 +29,7 @@ export function Sorter ({
   const [logic, setLogic] = useState<SorterLogic>();
 
   useEffect(() => {
-    return () => {logic?.pause(); console.log('cleanup')}
+    return () => {logic?.pause();}
   }, [logic]);
 
   useEffect(() => {
@@ -76,7 +76,6 @@ export function Sorter ({
         ctx.strokeRect(offset - borderWidth * 0.5, borderWidth * 0.5, (width - 2 * offset + borderWidth), innerHeight + borderWidth);
       }
 
-
       const fontSize = innerHeight / 20;
       const textX = offset + borderWidth
       const textY = borderWidth;
@@ -86,8 +85,17 @@ export function Sorter ({
       ctx.fillText(`Array Accesses: ${accesses}`, textX, textY  + fontSize * 2);
       ctx.fillText(`Real Time: ${logic.getRealTime().toFixed(1)}ms`, textX, textY + fontSize * 3);
       ctx.fillText(`Sleep Time: ${(logic.getSleepTime()/1000).toFixed(1)}s`, textX, textY + fontSize * 4);
-      ctx.fillText(`fps: ${(1000/frameTime).toFixed(0)}`, textX, textY + fontSize * 5);
+
+      if(!logic.isFinished()) {
+        ctx.fillText(`fps: ${(1000/frameTime).toFixed(0)}`, textX, textY + fontSize * 5);
+        return true;
+      } else {
+        ctx.fillText('fps: -', textX, textY + fontSize * 5);
+        return false;
+      }
+
     }
+    return false;
   }, [logic, border, defaultColor, comparedColor, sortedColor]);
 
   return (

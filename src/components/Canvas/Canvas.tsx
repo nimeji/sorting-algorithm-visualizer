@@ -4,12 +4,15 @@ import { useRef } from "react";
 import { useResizeObserver } from '../../hooks/useResizeObserver';
 
 type CanvasProps = {
-  draw: (ctx: CanvasRenderingContext2D, frameTime: number, avgFrameTime: number, frameCount: number) => void
-  setup?: (ctx: CanvasRenderingContext2D) => void,
+  draw: (ctx: CanvasRenderingContext2D, frameTime: number, avgFrameTime: number, frameCount: number) => boolean;
+  setup?: (ctx: CanvasRenderingContext2D) => void;
+  run?: boolean;
 }
 
-export function Canvas ({draw, setup}: CanvasProps) {
+export function Canvas ({draw, setup, run=true}: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const frameTime = useRef(0);
+  const frameCount = useRef(0);
 
   const canvasDimensions = useResizeObserver(canvasRef);
 
@@ -22,10 +25,14 @@ export function Canvas ({draw, setup}: CanvasProps) {
       if (setup) {
         setup(context);
       }
+
+      draw(context, frameTime.current, frameTime.current, frameCount.current);
     }
-  }, [canvasDimensions, setup]);
+  }, [canvasDimensions, setup, draw]);
 
   useEffect(() => {
+    if(!run) return;
+
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if(!context) return;
@@ -34,29 +41,25 @@ export function Canvas ({draw, setup}: CanvasProps) {
       setup(context);
     }
 
-    let frameCount = 0
     let t0 = performance.now();
-    let frameTime = 0;
 
     let animationFrameId: number;
 
-
     const render = () => {
-      frameCount++;
+      frameCount.current++;
       const t1 = performance.now()
-      frameTime += (t1 - t0 - frameTime) / 20;
+      frameTime.current += (t1 - t0 - frameTime.current) / 20;
 
-      draw(context, t1 - t0, frameTime, frameCount);
+      const repeatDraw = draw(context, t1 - t0, frameTime.current, frameCount.current);
       t0 = t1;
-
-      animationFrameId = window.requestAnimationFrame(render);
+      if(repeatDraw) animationFrameId = window.requestAnimationFrame(render);
     }
     render();
     
     return () => {
       window.cancelAnimationFrame(animationFrameId);
     }
-  }, [draw, setup]);
+  }, [run, draw, setup]);
 
   return <canvas ref={canvasRef} className={styles.canvas} />
 }
