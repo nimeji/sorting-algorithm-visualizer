@@ -44,7 +44,7 @@ export function Sorter ({
     }
   }, [logic, run]);
 
-  const draw = useCallback((ctx: CanvasRenderingContext2D) => {
+  const draw = useCallback((ctx: CanvasRenderingContext2D, _, frameTime: number) => {
     if(logic) {
       const width = ctx.canvas.width;
       const height = ctx.canvas.height;
@@ -54,18 +54,10 @@ export function Sorter ({
 
       ctx.clearRect(0, 0, width, height);
 
-      const {values, lastCompared, indicesSorted} = logic.getLastState();
+      const {values, lastCompared, indicesSorted, comparisons, accesses} = logic.getLastState();
 
       const elementWidth = Math.floor(innerWidth / values.length);
       const offset = (width - elementWidth * values.length) / 2;
-
-      if(borderWidth > 0)
-      {
-        ctx.lineWidth = borderWidth;
-        ctx.strokeStyle = 'black';
-        ctx.strokeRect(offset - borderWidth * 0.5, borderWidth * 0.5, width - 2 * offset + borderWidth, innerHeight + borderWidth);
-      }
-
 
       values.forEach((value, i) => {
         let color = defaultColor;
@@ -74,16 +66,33 @@ export function Sorter ({
         if(lastCompared.includes(i)) color = comparedColor;
 
         ctx.fillStyle = color;
-        ctx.fillRect(offset + elementWidth * i, innerHeight + borderWidth - innerHeight*value, elementWidth, innerHeight*value)
+        ctx.fillRect(offset + elementWidth * i, innerHeight + borderWidth - innerHeight*value, elementWidth*1.05, innerHeight*value)
       });
 
-    }
+      if(borderWidth > 0)
+      {
+        ctx.lineWidth = borderWidth;
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(offset - borderWidth * 0.5, borderWidth * 0.5, (width - 2 * offset + borderWidth), innerHeight + borderWidth);
+      }
 
+
+      const fontSize = innerHeight / 20;
+      const textX = offset + borderWidth
+      const textY = borderWidth;
+      ctx.font = `${fontSize}px sans-serif`;
+      ctx.fillStyle = 'black';
+      ctx.fillText(`Comparisons: ${comparisons}`,textX, textY  + fontSize);
+      ctx.fillText(`Array Accesses: ${accesses}`, textX, textY  + fontSize * 2);
+      ctx.fillText(`Real Time: ${logic.getRealTime().toFixed(1)}ms`, textX, textY + fontSize * 3);
+      ctx.fillText(`Sleep Time: ${(logic.getSleepTime()/1000).toFixed(1)}s`, textX, textY + fontSize * 4);
+      ctx.fillText(`fps: ${(1000/frameTime).toFixed(0)}`, textX, textY + fontSize * 5);
+    }
   }, [logic, border, defaultColor, comparedColor, sortedColor]);
 
   return (
     <div className={styles.sorter}>
-      <Canvas draw={draw}/>
+      <Canvas draw={draw} />
     </div>
   );
 }
