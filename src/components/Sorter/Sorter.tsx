@@ -3,7 +3,7 @@ import { useCallback } from "react";
 import { Canvas } from "../Canvas/Canvas";
 import { AlgorithmNames } from "./SorterAlgorithms";
 import { SorterLogic } from "./SorterLogic";
-import styles from './Sorter2.module.scss';
+import styles from './Sorter.module.scss';
 
 type SorterProps = {
   data: number[];
