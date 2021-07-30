@@ -76,7 +76,6 @@ describe('SorterLogic', () => {
 
   describe('with mocked SorterArray', () => {
     let spyRunNext: jest.SpyInstance;
-    let onFinishedCallback: jest.Mock;
     const comparisons = 123;
     const accesses = 456;
 
@@ -85,8 +84,7 @@ describe('SorterLogic', () => {
       jest.spyOn(SorterArray.prototype, 'accesses', 'get').mockReturnValue(accesses);
       jest.useFakeTimers();
 
-      onFinishedCallback = jest.fn();
-      instance = new SorterLogic(data, 'BubbleSort', SorterLogic.minDelay, onFinishedCallback);
+      instance = new SorterLogic(data, 'BubbleSort', SorterLogic.minDelay);
       spyRunNext = jest.spyOn(instance, 'runNext');
     });
 
@@ -157,6 +155,9 @@ describe('SorterLogic', () => {
     });
 
     it('calls onFinished when finnished', () => {
+      const onFinishedCallback = jest.fn()
+      
+      instance.setOnFinished(onFinishedCallback);
       instance.start();
       jest.advanceTimersToNextTimer(iterations);
       expect(onFinishedCallback).not.toHaveBeenCalled();

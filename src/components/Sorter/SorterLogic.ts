@@ -16,6 +16,7 @@ export class SorterLogic {
   private lastCompared: [number | undefined, number | undefined] = [undefined, undefined];
 
   private step = 0;
+  private tStart = 0;
 
   private sleepTime = 0;
   private realTime = 0;
@@ -62,7 +63,7 @@ export class SorterLogic {
     do {
       hasNext = this.runNext();
       this.step = this.step + 1;
-    } while(hasNext && this.sleepTime > this.delay * this.step)
+    } while(hasNext && t0 - this.tStart > this.delay * this.step)
 
     if(!hasNext) {
       this.pause();
@@ -78,6 +79,8 @@ export class SorterLogic {
     {
       this.timeout = window.setInterval(this.loop, this.trueDelay);
       this.running = true;
+      this.tStart = performance.now();
+      this.step = 0;
     }
   }
 
@@ -156,5 +159,9 @@ export class SorterLogic {
       this.pause();
       this.start();
     }
+  }
+
+  setOnFinished(callback: (() => void) | undefined) {
+    this.onFinished = callback;
   }
 }
