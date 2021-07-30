@@ -31,6 +31,8 @@ export class Sorter extends Component<SorterProps, SorterState> {
     sortedColor: 'green',
   };
 
+  private maxValues = 0;
+
   constructor(props: SorterProps) {
     super(props);
 
@@ -96,6 +98,10 @@ export class Sorter extends Component<SorterProps, SorterState> {
     return this.state.logic.isFinished();
   }
 
+  getMaxValues() {
+    return this.maxValues;
+  }
+
   draw (ctx: CanvasRenderingContext2D, frameTime:number, avgFrameTime: number) {
     const {
       border,
@@ -112,6 +118,8 @@ export class Sorter extends Component<SorterProps, SorterState> {
       const borderWidth = Math.ceil(Math.max(width, height) / 100 * border * 0.5)
       const innerWidth = width - 2 * borderWidth;
       const innerHeight = height - 2 * borderWidth;
+
+      this.maxValues = innerWidth;
 
       ctx.clearRect(0, 0, width, height);
 
