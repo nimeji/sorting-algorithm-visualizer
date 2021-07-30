@@ -14,6 +14,7 @@ type SorterProps = {
   comparedColor: string;
   sortedColor: string;
   onFinished?: () => void;
+  onMaxValuesChange?: (maxValues: number) => void;
 };
 
 type SorterState = {
@@ -98,8 +99,13 @@ export class Sorter extends Component<SorterProps, SorterState> {
     return this.state.logic.isFinished();
   }
 
-  getMaxValues() {
-    return this.maxValues;
+  private setMaxValues(maxValues: number) {
+    const { onMaxValuesChange } = this.props;
+
+    if(onMaxValuesChange && maxValues !== this.maxValues) {
+      onMaxValuesChange(maxValues);
+    }
+    this.maxValues = maxValues;
   }
 
   draw (ctx: CanvasRenderingContext2D, frameTime:number, avgFrameTime: number) {
@@ -119,7 +125,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
       const innerWidth = width - 2 * borderWidth;
       const innerHeight = height - 2 * borderWidth;
 
-      this.maxValues = innerWidth;
+      this.setMaxValues(innerWidth);
 
       ctx.clearRect(0, 0, width, height);
 
