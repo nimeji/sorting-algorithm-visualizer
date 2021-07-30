@@ -283,4 +283,4 @@ export const algorithms = {
   CombSort,
 }
 
-export type AlgorithmNames = keyof typeof algorithms;
+export type AlgorithmName = keyof typeof algorithms;

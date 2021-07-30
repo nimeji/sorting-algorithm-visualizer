@@ -1,12 +1,12 @@
 import { Component } from "react";
 import { Canvas } from "../Canvas/Canvas";
-import { AlgorithmNames } from "./SorterAlgorithms";
+import { AlgorithmName } from "./SorterAlgorithms";
 import { SorterLogic } from "./SorterLogic";
 import styles from './Sorter.module.scss';
 
 type SorterProps = {
   data: number[];
-  algorithm: AlgorithmNames;
+  algorithm: AlgorithmName;
   sleepTime: number,
   run: boolean,
   border: number;
