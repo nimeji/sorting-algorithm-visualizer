@@ -139,4 +139,15 @@ describe('Sorter', () => {
     expect(MockedSorterLogic.prototype.setDelay).toHaveBeenCalled();
   });
 
+  it('enables drawing when started', () => {
+    instance.start();
+    expect(wrapper.find(Canvas).props().run).toBeTruthy();
+  });
+
+  it('disables drawing when paused', () => {
+    expect(wrapper.find(Canvas).props().run).toBeFalsy();
+    instance.start();
+    instance.pause();
+    expect(wrapper.find(Canvas).props().run).toBeFalsy();
+  });
 });

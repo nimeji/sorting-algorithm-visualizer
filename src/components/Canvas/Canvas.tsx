@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { useResizeObserver } from '../../hooks/useResizeObserver';
 
 type CanvasProps = {
-  draw: (ctx: CanvasRenderingContext2D, frameTime: number, avgFrameTime: number, frameCount: number) => boolean;
+  draw: (ctx: CanvasRenderingContext2D, frameTime: number, avgFrameTime: number, frameCount: number) => void;
   setup?: (ctx: CanvasRenderingContext2D) => void;
   run?: boolean;
 }
@@ -31,8 +31,6 @@ export function Canvas ({draw, setup, run=true}: CanvasProps) {
   }, [canvasDimensions, setup, draw]);
 
   useEffect(() => {
-    if(!run) return;
-
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if(!context) return;
@@ -50,9 +48,9 @@ export function Canvas ({draw, setup, run=true}: CanvasProps) {
       const t1 = performance.now()
       frameTime.current += (t1 - t0 - frameTime.current) / 20;
 
-      const repeatDraw = draw(context, t1 - t0, frameTime.current, frameCount.current);
+      draw(context, t1 - t0, frameTime.current, frameCount.current);
       t0 = t1;
-      if(repeatDraw) animationFrameId = window.requestAnimationFrame(render);
+      if(run) animationFrameId = window.requestAnimationFrame(render);
     }
     render();
     

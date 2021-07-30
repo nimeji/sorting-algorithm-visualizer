@@ -19,6 +19,7 @@ type SorterProps = {
 
 type SorterState = {
   logic: SorterLogic,
+  doDraw: boolean,
 };
 
 export class Sorter extends Component<SorterProps, SorterState> {
@@ -39,6 +40,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
     this.state = {
       logic: new SorterLogic(props.data, props.algorithm, props.sleepTime, props.onFinished),
+      doDraw: false,
     };
 
     this.draw= this.draw.bind(this);
@@ -77,10 +79,16 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
   start() {
     this.state.logic.start();
+    this.setState({
+      doDraw: true,
+    });
   }
 
   pause() {
     this.state.logic.pause();
+    this.setState({
+      doDraw: false,
+    });
   }
 
   reset() {
@@ -163,20 +171,18 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
       if(!logic.isFinished()) {
         ctx.fillText(`fps: ${(1000/avgFrameTime).toFixed(0)}`, textX, textY + fontSize * 5);
-        return true;
       } else {
         ctx.fillText('fps: -', textX, textY + fontSize * 5);
-        return false;
       }
-
     }
-    return false;
   }
 
   render() {
+    const { doDraw } = this.state;
+
     return (
       <div className={styles.sorter}>
-        <Canvas draw={this.draw} />
+        <Canvas draw={this.draw} run={doDraw} />
       </div>
     );
   }
