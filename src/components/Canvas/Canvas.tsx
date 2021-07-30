@@ -6,10 +6,10 @@ import { useResizeObserver } from '../../hooks/useResizeObserver';
 type CanvasProps = {
   draw: (ctx: CanvasRenderingContext2D, frameTime: number, avgFrameTime: number, frameCount: number) => void;
   setup?: (ctx: CanvasRenderingContext2D) => void;
-  run?: boolean;
+  redraw?: () => boolean;
 }
 
-export function Canvas ({draw, setup, run=true}: CanvasProps) {
+export function Canvas ({draw, setup, redraw=()=>true}: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameTime = useRef(0);
   const frameCount = useRef(0);
@@ -44,20 +44,24 @@ export function Canvas ({draw, setup, run=true}: CanvasProps) {
     let animationFrameId: number;
 
     const render = () => {
-      frameCount.current++;
-      const t1 = performance.now()
-      frameTime.current += (t1 - t0 - frameTime.current) / 20;
+      if(redraw()) {
+        frameCount.current++;
+        const t1 = performance.now()
+        frameTime.current += (t1 - t0 - frameTime.current) / 20;
+        draw(context, t1 - t0, frameTime.current, frameCount.current);
+        t0 = t1;
 
-      draw(context, t1 - t0, frameTime.current, frameCount.current);
-      t0 = t1;
-      if(run) animationFrameId = window.requestAnimationFrame(render);
+        console.log('draw');
+      }
+
+      animationFrameId = window.requestAnimationFrame(render);
     }
     render();
     
     return () => {
       window.cancelAnimationFrame(animationFrameId);
     }
-  }, [run, draw, setup]);
+  }, [redraw, draw, setup]);
 
   return <canvas ref={canvasRef} className={styles.canvas} />
 }

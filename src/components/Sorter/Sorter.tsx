@@ -8,7 +8,6 @@ type SorterProps = {
   data: number[];
   algorithm: AlgorithmName;
   sleepTime: number,
-  run: boolean,
   border: number;
   defaultColor: string;
   comparedColor: string;
@@ -18,15 +17,14 @@ type SorterProps = {
 };
 
 type SorterState = {
-  logic: SorterLogic,
-  doDraw: boolean,
+  logic: SorterLogic;
+  redraw: () => boolean;
 };
 
 export class Sorter extends Component<SorterProps, SorterState> {
   static defaultProps = { 
     algorithm: 'BubbleSort', 
     sleepTime: 100, 
-    run: false,
     border: 1,
     defaultColor: 'lightblue',
     comparedColor: 'red',
@@ -38,25 +36,23 @@ export class Sorter extends Component<SorterProps, SorterState> {
   constructor(props: SorterProps) {
     super(props);
 
-    this.state = {
-      logic: new SorterLogic(props.data, props.algorithm, props.sleepTime, props.onFinished),
-      doDraw: false,
-    };
-
     this.draw= this.draw.bind(this);
-  }
+    this.onFinished = this.onFinished.bind(this);
 
-  componentDidMount() {
-    if(this.props.run) this.start();
+    const logic = new SorterLogic(props.data, props.algorithm, props.sleepTime, this.onFinished)
+
+    this.state = {
+      logic: logic,
+      redraw: () => logic.didUpdate(),
+    };
   }
 
   componentDidUpdate(prevProps: SorterProps, prevState: SorterState) {
-    const { data, algorithm, sleepTime, run } = this.props;
+    const { data, algorithm, sleepTime } = this.props;
     const { logic } = this.state;
 
     if (prevState.logic !== logic) {
       prevState.logic.pause();
-      if(run) this.start();
     }
 
     if (prevProps.data !== data || prevProps.algorithm !== algorithm) {
@@ -66,11 +62,6 @@ export class Sorter extends Component<SorterProps, SorterState> {
     if (prevProps.sleepTime !== sleepTime) {
       logic.setDelay(sleepTime);
     }
-    
-    if (prevProps.run !== run) {
-      if(run) this.start();
-      else this.pause();
-    }
   }
 
   componentWillUnmount() {
@@ -79,23 +70,27 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
   start() {
     this.state.logic.start();
-    this.setState({
-      doDraw: true,
-    });
   }
 
   pause() {
     this.state.logic.pause();
-    this.setState({
-      doDraw: false,
-    });
+  }
+
+  onFinished() {
+    const { onFinished } = this.props;
+
+    this.pause();
+    if(onFinished) onFinished();
   }
 
   reset() {
     const { data, algorithm, sleepTime, onFinished } = this.props;
 
+    const logic = new SorterLogic(data, algorithm, sleepTime, onFinished);
+
     this.setState({
-      logic: new SorterLogic(data, algorithm, sleepTime, onFinished),
+      logic: logic,
+      redraw: () => logic.didUpdate(),
     });
   }
 
@@ -169,7 +164,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
       ctx.fillText(`Real Time: ${logic.getRealTime().toFixed(1)}ms`, textX, textY + fontSize * 3);
       ctx.fillText(`Sleep Time: ${(logic.getSleepTime()/1000).toFixed(1)}s`, textX, textY + fontSize * 4);
 
-      if(!logic.isFinished()) {
+      if(logic.isRunning()) {
         ctx.fillText(`fps: ${(1000/avgFrameTime).toFixed(0)}`, textX, textY + fontSize * 5);
       } else {
         ctx.fillText('fps: -', textX, textY + fontSize * 5);
@@ -178,93 +173,12 @@ export class Sorter extends Component<SorterProps, SorterState> {
   }
 
   render() {
-    const { doDraw } = this.state;
+    const { redraw } = this.state;
 
     return (
       <div className={styles.sorter}>
-        <Canvas draw={this.draw} run={doDraw} />
+        <Canvas draw={this.draw} redraw={redraw} />
       </div>
     );
   }
 }
-
-
-
-  // const [logic, setLogic] = useState<SorterLogic>();
-
-  // useEffect(() => {
-  //   return () => {logic?.pause();}
-  // }, [logic]);
-
-  // useEffect(() => {
-  //   setLogic(new SorterLogic(data, algorithm, sleepTime));
-  // }, [data, algorithm, sleepTime]);
-
-  // useEffect(() => {
-  //   if(run) {
-  //     logic?.start();
-  //   } else {
-  //     logic?.pause();
-  //   }
-  // }, [logic, run]);
-
-  // draw (ctx: CanvasRenderingContext2D, _, frameTime: number) => {
-  //   if(logic) {
-  //     const width = ctx.canvas.width;
-  //     const height = ctx.canvas.height;
-  //     const borderWidth = Math.ceil(Math.max(width, height) / 100 * border)
-  //     const innerWidth = width - 2 * borderWidth;
-  //     const innerHeight = height - 2 * borderWidth;
-
-  //     ctx.clearRect(0, 0, width, height);
-
-  //     const {values, lastCompared, indicesSorted, comparisons, accesses} = logic.getLastState();
-
-  //     const elementWidth = Math.floor(innerWidth / values.length);
-  //     const offset = (width - elementWidth * values.length) / 2;
-
-  //     values.forEach((value, i) => {
-  //       let color = defaultColor;
-
-  //       if(indicesSorted.has(i)) color = sortedColor;
-  //       if(lastCompared.includes(i)) color = comparedColor;
-
-  //       ctx.fillStyle = color;
-  //       ctx.fillRect(offset + elementWidth * i, innerHeight + borderWidth - innerHeight*value, elementWidth*1.05, innerHeight*value)
-  //     });
-
-  //     if(borderWidth > 0)
-  //     {
-  //       ctx.lineWidth = borderWidth;
-  //       ctx.strokeStyle = 'black';
-  //       ctx.strokeRect(offset - borderWidth * 0.5, borderWidth * 0.5, (width - 2 * offset + borderWidth), innerHeight + borderWidth);
-  //     }
-
-  //     const fontSize = innerHeight / 20;
-  //     const textX = offset + borderWidth
-  //     const textY = borderWidth;
-  //     ctx.font = `${fontSize}px sans-serif`;
-  //     ctx.fillStyle = 'black';
-  //     ctx.fillText(`Comparisons: ${comparisons}`,textX, textY  + fontSize);
-  //     ctx.fillText(`Array Accesses: ${accesses}`, textX, textY  + fontSize * 2);
-  //     ctx.fillText(`Real Time: ${logic.getRealTime().toFixed(1)}ms`, textX, textY + fontSize * 3);
-  //     ctx.fillText(`Sleep Time: ${(logic.getSleepTime()/1000).toFixed(1)}s`, textX, textY + fontSize * 4);
-
-  //     if(!logic.isFinished()) {
-  //       ctx.fillText(`fps: ${(1000/frameTime).toFixed(0)}`, textX, textY + fontSize * 5);
-  //       return true;
-  //     } else {
-  //       ctx.fillText('fps: -', textX, textY + fontSize * 5);
-  //       return false;
-  //     }
-
-  //   }
-  //   return false;
-  // }
-
-//   render() {
-//     <div className={styles.sorter}>
-//       <Canvas draw={this.draw} />
-//     </div>
-//   }
-// }

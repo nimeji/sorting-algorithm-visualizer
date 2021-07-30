@@ -24,7 +24,7 @@ export class SorterLogic {
   private timeout = 0;
   private running = false;
 
-  private updated = false;
+  private updated = true;
   private finished = false;
 
   private onFinished: (() => void) | undefined;
