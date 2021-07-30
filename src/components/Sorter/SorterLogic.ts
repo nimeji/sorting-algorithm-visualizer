@@ -1,4 +1,4 @@
-import { algorithms, SorterAlgorithmGenerator } from "./SorterAlgorithms";
+import { AlgorithmNames, algorithms, SorterAlgorithmGenerator } from "./SorterAlgorithms";
 import { SorterArray } from "./SorterArray";
 
 
@@ -26,10 +26,12 @@ export class SorterLogic {
   private updated = false;
   private finished = false;
 
-  constructor(data: number[], algorithm: keyof typeof algorithms, delay: number) {
-    this.values = new SorterArray(data, SorterLogic.compareFn);
+  private onFinished: (() => void) | undefined;
 
+  constructor(data: number[], algorithm: AlgorithmNames, delay: number, onFinished?: () => void) {
+    this.values = new SorterArray(data, SorterLogic.compareFn);
     this.generator = algorithms[algorithm](this.values, this.indidcesSorted);
+    this.onFinished = onFinished;
 
     this.setDelay(delay);
 
@@ -65,6 +67,7 @@ export class SorterLogic {
     if(!hasNext) {
       this.pause();
       this.finished = true;
+      if(this.onFinished) this.onFinished();
     }
 
     this.realTime = this.realTime + performance.now() - t0; 
