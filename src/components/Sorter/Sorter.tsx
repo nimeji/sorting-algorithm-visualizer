@@ -35,7 +35,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
     super(props);
 
     this.state = {
-      logic: new SorterLogic(props.data, props.algorithm, props.sleepTime),
+      logic: new SorterLogic(props.data, props.algorithm, props.sleepTime, props.onFinished),
     };
 
     this.draw= this.draw.bind(this);
@@ -81,10 +81,10 @@ export class Sorter extends Component<SorterProps, SorterState> {
   }
 
   reset() {
-    const { data, algorithm, sleepTime } = this.props;
+    const { data, algorithm, sleepTime, onFinished } = this.props;
 
     this.setState({
-      logic: new SorterLogic(data, algorithm, sleepTime),
+      logic: new SorterLogic(data, algorithm, sleepTime, onFinished),
     });
   }
 
