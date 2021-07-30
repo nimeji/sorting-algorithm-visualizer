@@ -16,10 +16,13 @@ describe('AlgorithmSelection', () => {
     expect(wrapper.find('select')).toHaveLength(1);
   });
 
-  it('renders all algorithm options', () => {
-    const rendered = wrapper.find('option').map(element => element.text());
+  it('renders all options correctly', () => {
+    const options = wrapper.find('option');
 
-    algorithmNames.forEach(name => expect(rendered.includes(name)).toBeTruthy());
+    options.forEach((option, i) => {
+      expect(option.text()).toBe(algorithmNames[i]);
+      expect(option.props().value).toBe(algorithmNames[i]);
+    });
   });
 
   it('displays the correct algorithm as selected', () => {

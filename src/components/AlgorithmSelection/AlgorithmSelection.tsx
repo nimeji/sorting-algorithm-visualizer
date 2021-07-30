@@ -14,8 +14,9 @@ export function AlgorithmSelection({algorithm, onChange, disabled=false}: Algori
     <select name="Algorithm" value={algorithm} disabled={disabled} onChange={(event) => {
       const value = event.target.value;
 
-      if(algorithmNameList.includes(value))
-        if(onChange) onChange(value as AlgorithmName);
+      if(algorithmNameList.includes(value) && onChange) {
+        onChange(value as AlgorithmName);
+      }
     }}>
       {algorithmNameList.map(name => <option key={name} value={name}>{name}</option>)}
     </select>
