@@ -11,8 +11,9 @@ type CanvasProps = {
 
 export function Canvas ({draw, setup, redraw=()=>true}: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const frameTime = useRef(0);
+  const frameTime = useRef(1000);
   const frameCount = useRef(0);
+  const lastFrameTime = useRef(0);
 
   const canvasDimensions = useResizeObserver(canvasRef);
 
@@ -38,7 +39,7 @@ export function Canvas ({draw, setup, redraw=()=>true}: CanvasProps) {
     if(setup) {
       setup(context);
     }
-
+    
     let t0 = performance.now();
 
     let animationFrameId: number;
@@ -47,17 +48,16 @@ export function Canvas ({draw, setup, redraw=()=>true}: CanvasProps) {
       if(redraw()) {
         frameCount.current++;
         const t1 = performance.now()
-        frameTime.current += (t1 - t0 - frameTime.current) / 20;
-        draw(context, t1 - t0, frameTime.current, frameCount.current);
+        lastFrameTime.current = t1 - t0;
+        draw(context, lastFrameTime.current, frameTime.current, frameCount.current);
         t0 = t1;
-
-        console.log('draw');
       }
 
+      frameTime.current += (lastFrameTime.current - frameTime.current) / 20;
       animationFrameId = window.requestAnimationFrame(render);
     }
     render();
-    
+
     return () => {
       window.cancelAnimationFrame(animationFrameId);
     }
