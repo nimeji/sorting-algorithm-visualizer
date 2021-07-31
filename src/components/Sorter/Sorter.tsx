@@ -18,7 +18,6 @@ type SorterProps = {
 
 type SorterState = {
   logic: SorterLogic;
-  redraw: () => boolean;
 };
 
 export class Sorter extends Component<SorterProps, SorterState> {
@@ -36,6 +35,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
   constructor(props: SorterProps) {
     super(props);
 
+    this.redraw = this.redraw.bind(this);
     this.draw= this.draw.bind(this);
     this.onFinished = this.onFinished.bind(this);
 
@@ -43,7 +43,6 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
     this.state = {
       logic: logic,
-      redraw: () => logic.didUpdate(),
     };
   }
 
@@ -90,7 +89,6 @@ export class Sorter extends Component<SorterProps, SorterState> {
 
     this.setState({
       logic: logic,
-      redraw: () => logic.didUpdate(),
     });
   }
 
@@ -111,7 +109,11 @@ export class Sorter extends Component<SorterProps, SorterState> {
     this.maxValues = maxValues;
   }
 
-  draw (ctx: CanvasRenderingContext2D, frameTime:number, avgFrameTime: number) {
+  private redraw() {
+    return this.state.logic.didUpdate();
+  }
+
+  private draw (ctx: CanvasRenderingContext2D, frameTime:number, avgFrameTime: number) {
     const {
       border,
       defaultColor,
@@ -173,11 +175,9 @@ export class Sorter extends Component<SorterProps, SorterState> {
   }
 
   render() {
-    const { redraw } = this.state;
-
     return (
       <div className={styles.sorter}>
-        <Canvas draw={this.draw} redraw={redraw} />
+        <Canvas draw={this.draw} redraw={this.redraw} />
       </div>
     );
   }
