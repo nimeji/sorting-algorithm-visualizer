@@ -67,9 +67,7 @@ describe('SorterLogic', () => {
       expect(instance.getTrueDelay()).toBe(delay);
     });
 
-    it('indicates an update after running', () => {
-      expect(instance.didUpdate()).toBeFalsy();
-      instance.runNext();
+    it('indicates an update initially', () => {
       expect(instance.didUpdate()).toBeTruthy();
     });
   });
