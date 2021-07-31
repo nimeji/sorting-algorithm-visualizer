@@ -31,7 +31,7 @@ describe('SleepTimeSelection', () => {
     const options = wrapper.find('option');
 
     options.forEach((option, i) => {
-      expect(option.text()).toBe(`${sleepTimes[i]/1000}s`);
+      expect(option.text()).toBe(`${sleepTimes[i]}ms`);
       expect(option.props().value).toBe(sleepTimes[i]);
     });
   });

@@ -13,7 +13,7 @@ export function SleepTimeSelection({sleepTime, options, onChange}: SleepTimeSele
         onChange(value);
       }
     }}>
-      {options.map(value => <option key={value} value={value}>{value/1000}s</option>)}
+      {options.map(value => <option key={value} value={value}>{value}ms</option>)}
     </select>
   );
 }
