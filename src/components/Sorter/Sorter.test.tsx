@@ -34,6 +34,10 @@ describe('Sorter', () => {
     expect(typeof wrapper.find(Canvas).props().draw).toBe('function');
   });
 
+  it('passes a redraw function to the canvas', () => {
+    expect(typeof wrapper.find(Canvas).props().redraw).toBe('function');
+  });
+
   it.skip('renders correct number of SorterValues', () => {
     // todo
   });
@@ -137,17 +141,5 @@ describe('Sorter', () => {
       sleepTime: 1234,
     });
     expect(MockedSorterLogic.prototype.setDelay).toHaveBeenCalled();
-  });
-
-  it('enables drawing when started', () => {
-    instance.start();
-    expect(wrapper.find(Canvas).props().run).toBeTruthy();
-  });
-
-  it('disables drawing when paused', () => {
-    expect(wrapper.find(Canvas).props().run).toBeFalsy();
-    instance.start();
-    instance.pause();
-    expect(wrapper.find(Canvas).props().run).toBeFalsy();
   });
 });
