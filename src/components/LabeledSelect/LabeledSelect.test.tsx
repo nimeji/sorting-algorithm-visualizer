@@ -33,6 +33,12 @@ describe('LabeledSelect', () => {
     expect(wrapper.find('select').props().onChange).toBe(callback);
   });
 
+  it('corretly passes the disabled prop to the select element', () => {
+    expect(wrapper.find('select').props().disabled).toBeFalsy();
+    wrapper.setProps({disabled: true});
+    expect(wrapper.find('select').props().disabled).toBeTruthy();
+  })
+
   it.skip('renders children correctly', () => {
     //todo
   });
