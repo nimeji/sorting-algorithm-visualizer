@@ -11,14 +11,22 @@ function* BubbleSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgo
 
   for(let i = 0; i < length - 1; i++) {
     let j;
+    let sorted = true;
     for(j = 0; j < length - 1 - i; j++) {
       yield [j, j+1];
 
       if(array.gt(j, j+1)) {
         array.swap(j, j+1);
+        sorted = false;
       }
     }
     indicesSorted.add(j);
+    if(sorted) {
+      for(let k = 0; k < j; k++) {
+        indicesSorted.add(k);
+      }
+      break;
+    }
   }
   indicesSorted.add(0);
   yield [undefined, undefined];
