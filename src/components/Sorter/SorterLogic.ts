@@ -46,10 +46,11 @@ export class SorterLogic {
       const [i, j] = next.value;
 
       this.lastCompared = [i, j];
-      this.updated = true;
     } else {
       this.lastCompared = [undefined, undefined];
     }
+
+    this.updated = true;
 
     return !next.done;
   }

@@ -238,5 +238,13 @@ describe('SorterLogic', () => {
       instance.getLastState();
       expect(instance.didUpdate()).toBeFalsy();
     });
+
+    it('indicates an update after every step', () => {
+      while(instance.runNext()) {
+        expect(instance.didUpdate()).toBeTruthy();
+        instance.getLastState();
+      }
+      expect(instance.didUpdate()).toBeTruthy();
+    });
   });
 });
