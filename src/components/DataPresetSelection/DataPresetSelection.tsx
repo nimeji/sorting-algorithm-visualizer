@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { LabeledSelect } from "../LabeledSelect/LabeledSelect";
 
 type DataPresetSelectionProps = {
   count: number;
   preset?: DataPreset;
-  onChange?: (preset: DataPreset, data: number[]) => void;
+  onPresetChange?: (preset: DataPreset) => void;
+  onDataChange?: (data: number[]) => void;
 };
 
 export type DataPreset = keyof typeof dataGenerators;
@@ -57,12 +59,16 @@ const dataGenerators = {
 
 export const dataPresets = Object.keys(dataGenerators) as DataPreset[];
 
-export function DataPresetSelection({count, preset='shuffled', onChange}: DataPresetSelectionProps) {
+export function DataPresetSelection({count, preset='shuffled', onPresetChange, onDataChange}: DataPresetSelectionProps) {
+  useEffect(() => {
+    if(onDataChange) onDataChange(dataGenerators[preset](count));
+  }, [preset, count, onDataChange]);
+
   return (
     <LabeledSelect text="Data Preset" value={preset} onChange={(event) => {
-      if(onChange) {
+      if(onPresetChange) {
         const preset = event.target.value as DataPreset;
-        onChange(preset, dataGenerators[preset](count));
+        onPresetChange(preset);
       }
     }}>
       <option value="shuffled">Shuffled</option>

@@ -1,4 +1,4 @@
-import { shallow, ShallowWrapper } from "enzyme"
+import { mount, ReactWrapper } from "enzyme"
 import React from "react";
 import { LabeledSelect } from "../LabeledSelect/LabeledSelect";
 import { dataPresets, DataPresetSelection } from "./DataPresetSelection";
@@ -12,14 +12,15 @@ function isSorted(array: any[], compare: (i: any, j: any) => boolean) {
 }
 
 describe('DataPresetSelection', () => {
-  let wrapper: ShallowWrapper;
-  const callback = jest.fn();
-  const count = 1500;
+  let wrapper: ReactWrapper;
+  const presetCallback = jest.fn();
+  const dataCallback = jest.fn();
+  const count = 150;
   const uniques = 16;
   let onChange: React.ChangeEventHandler<HTMLSelectElement>;
 
   beforeEach(() => {
-    wrapper = shallow(<DataPresetSelection count={count} onChange={callback} />);
+    wrapper = mount(<DataPresetSelection count={count} onPresetChange={presetCallback} onDataChange={dataCallback} />);
     onChange = wrapper.find(LabeledSelect).props().onChange!;
   });
 
@@ -28,10 +29,7 @@ describe('DataPresetSelection', () => {
   });
 
   it('renders all options', () => {
-    const options = wrapper.find(LabeledSelect).children().map(child => {
-      expect(child.type()).toBe('option');
-      return child.props().value
-    });
+    const options = wrapper.find('option').map(option => option.props().value);
     dataPresets.forEach(preset => expect(options.includes(preset)).toBeTruthy());
   });
 
@@ -50,27 +48,50 @@ describe('DataPresetSelection', () => {
 
   describe('presets', () => {
     describe('shuffled', () => {
-      it('calls onChange callback with correct preset name', () => {
+      beforeEach(() => {
+        wrapper.setProps({preset: 'shuffled'});
+      });
+
+      it('calls onPresetChange callback with correct preset name', () => {
         onChange({target: {value: 'shuffled'}} as React.ChangeEvent<HTMLSelectElement>);
         
-        const [preset, data] = callback.mock.calls[0];
+        const preset = presetCallback.mock.calls[0][0];
 
         expect(preset).toBe('shuffled');
+      });
+
+      it('calls onDataChange callback with correct data', () => {
+        expect(dataCallback).toHaveBeenCalled();
+
+        const data = dataCallback.mock.calls[0][0];
+
         expect(Array.isArray(data)).toBeTruthy();
       
         const array = data as any[]
         expect(isSorted(array, (i: any, j: any) => i <= j)).toBeFalsy();
         expect(isSorted(array, (i: any, j: any) => i >= j)).toBeFalsy();
-      });
+      })
     });
 
     describe('sorted', () => {
+      beforeEach(() => {
+        wrapper.setProps({preset: 'sorted'});
+      });
+
       it('calls onChange callback with correct arguments', () => {
         onChange({target: {value: 'sorted'}} as React.ChangeEvent<HTMLSelectElement>);
 
-        const [preset, data] = callback.mock.calls[0];
+        const preset = presetCallback.mock.calls[0][0];
 
         expect(preset).toBe('sorted');
+
+      });
+
+      it('calls onDataChange callback with correct data', () => {
+        expect(dataCallback).toHaveBeenCalled();
+
+        const data = dataCallback.mock.calls[1][0];
+
         expect(Array.isArray(data)).toBeTruthy();
 
         expect(isSorted(data as any[], (i: any, j: any) => i <= j)).toBeTruthy();
@@ -78,12 +99,24 @@ describe('DataPresetSelection', () => {
     });
 
     describe('reverseSorted', () => {
+      beforeEach(() => {
+        wrapper.setProps({preset: 'reverseSorted'});
+      });
+
       it('calls onChange callback with correct arguments', () => {
         onChange({target: {value: 'reverseSorted'}} as React.ChangeEvent<HTMLSelectElement>);
 
-        const [preset, data] = callback.mock.calls[0];
+        const preset = presetCallback.mock.calls[0][0];
         
         expect(preset).toBe('reverseSorted');
+
+      });
+
+      it('calls onDataChange callback with correct data', () => {
+        expect(dataCallback).toHaveBeenCalled();
+
+        const data = dataCallback.mock.calls[1][0];
+
         expect(Array.isArray(data)).toBeTruthy();
 
         expect(isSorted(data as any[], (i: any, j: any) => i >= j)).toBeTruthy();
@@ -91,12 +124,24 @@ describe('DataPresetSelection', () => {
     });
 
     describe('fewUnique', () => {
+      beforeEach(() => {
+        wrapper.setProps({preset: 'fewUnique'});
+      });
+
       it('calls onChange callback with correct arguments', () => {
         onChange({target: {value: 'fewUnique'}} as React.ChangeEvent<HTMLSelectElement>);
 
-        const [preset, data] = callback.mock.calls[0];
+        const preset = presetCallback.mock.calls[0][0];
         
         expect(preset).toBe('fewUnique');
+
+      });
+
+      it('calls onDataChange callback with correct data', () => {
+        expect(dataCallback).toHaveBeenCalled();
+
+        const data = dataCallback.mock.calls[1][0];
+
         expect(Array.isArray(data)).toBeTruthy();
 
         const array = data as any[]
