@@ -11,11 +11,11 @@ function cloneArray<T>(array: Array<T>) {
 
 export class SorterArray {
   private array: number[];
-  private compareFn: (a: number, b: number) => boolean;
+  private compareFn: (a: number, b: number) => number;
   private _accesses: number = 0;
   private _comparisons: number = 0;
 
-  constructor(array: number[], compareFn: (a: number, b: number) => boolean) {
+  constructor(array: number[], compareFn: (a: number, b: number) => number) {
     this.array = cloneArray(array);
     this.compareFn = compareFn;
   }
@@ -48,10 +48,29 @@ export class SorterArray {
     this.array[i] = v;
   }
 
-  compare(i: number, j: number) {
+  private compare(i: number, j: number) {
     this._comparisons = this._comparisons + 1;
-
     return this.compareFn(this.get(i), this.get(j));
+  }
+
+  lt(i: number, j: number) {
+    return this.compare(i, j) < 0;
+  }
+
+  gt(i: number, j: number) {
+    return this.compare(i, j) > 0;
+  }
+
+  lte(i: number, j: number) {
+    return this.compare(i, j) <= 0;
+  }
+
+  gte(i: number, j: number) {
+    return this.compare(i, j) >= 0;
+  }
+
+  eq(i: number, j: number) {
+    return this.compare(i, j) === 0;
   }
 
   swap(i: number, j: number) {

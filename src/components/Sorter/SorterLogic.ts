@@ -3,7 +3,7 @@ import { SorterArray } from "./SorterArray";
 
 
 export class SorterLogic {
-  static readonly compareFn = (i: number, j: number) => i < j;
+  static readonly compareFn = (i: number, j: number) => i - j;
   static readonly minDelay = 10;
 
 

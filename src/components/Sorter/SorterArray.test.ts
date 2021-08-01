@@ -8,7 +8,7 @@ describe('SorterArray', () => {
 
 
   beforeEach(() => {
-    instance = new SorterArray(data, (i: number, j: number) => i > j);
+    instance = new SorterArray(data, (i: number, j: number) => i-j);
   });
 
   it('throws an error when an index is out of range', () => {
@@ -22,11 +22,6 @@ describe('SorterArray', () => {
     expect(() => instance.swap(instance.length, 0)).toThrowError(RangeError);
     expect(() => instance.swap(0, -1)).toThrowError(RangeError);
     expect(() => instance.swap(0, instance.length)).toThrowError(RangeError);
-
-    expect(() => instance.compare(-1, 0)).toThrowError(RangeError);
-    expect(() => instance.compare(instance.length, 0)).toThrowError(RangeError);
-    expect(() => instance.compare(0, -1)).toThrowError(RangeError);
-    expect(() => instance.compare(0, instance.length)).toThrowError(RangeError);
   });
 
   it('returns the correct array length', () => {
@@ -89,16 +84,73 @@ describe('SorterArray', () => {
     expect(instance.accesses).toBe(40);
   });
 
-  it('returns the correct number of accesses and comparisons after compare', () => {
+  it('returns the correct number of accesses and comparisons after gt', () => {
     for(let i = 0; i < 10; i++) {
-      instance.compare(a, b);
+      instance.gt(a, b);
     }
-
     expect(instance.accesses).toBe(20);
     expect(instance.comparisons).toBe(10);
   });
 
-  it('returns the correct result for compare', () => {
-    expect(instance.compare(a, b)).toBeFalsy();
+  it('returns the correct result for gt', () => {
+    expect(instance.gt(0, 1)).toBeTruthy();
+    expect(instance.gt(1, 1)).toBeFalsy();
+    expect(instance.gt(1, 0)).toBeFalsy();
+  });
+
+  it('returns the correct number of accesses and comparisons after lt', () => {
+    for(let i = 0; i < 10; i++) {
+      instance.lt(a, b);
+    }
+    expect(instance.accesses).toBe(20);
+    expect(instance.comparisons).toBe(10);
+  });
+
+  it('returns the correct result for lt', () => {
+    expect(instance.lt(0, 1)).toBeFalsy();
+    expect(instance.lt(1, 1)).toBeFalsy();
+    expect(instance.lt(1, 0)).toBeTruthy();
+  });
+
+  it('returns the correct number of accesses and comparisons after gte', () => {
+    for(let i = 0; i < 10; i++) {
+      instance.gte(a, b);
+    }
+    expect(instance.accesses).toBe(20);
+    expect(instance.comparisons).toBe(10);
+  });
+
+  it('returns the correct result for gte', () => {
+    expect(instance.gte(0, 1)).toBeTruthy();
+    expect(instance.gte(1, 1)).toBeTruthy();
+    expect(instance.gte(1, 0)).toBeFalsy();
+  });
+
+  it('returns the correct number of accesses and comparisons after lte', () => {
+    for(let i = 0; i < 10; i++) {
+      instance.lte(a, b);
+    }
+    expect(instance.accesses).toBe(20);
+    expect(instance.comparisons).toBe(10);
+  });
+
+  it('returns the correct result for lte', () => {
+    expect(instance.lte(0, 1)).toBeFalsy();
+    expect(instance.lte(1, 1)).toBeTruthy();
+    expect(instance.lte(1, 0)).toBeTruthy();
+  });
+
+  it('returns the correct number of accesses and comparisons after eq', () => {
+    for(let i = 0; i < 10; i++) {
+      instance.eq(a, b);
+    }
+    expect(instance.accesses).toBe(20);
+    expect(instance.comparisons).toBe(10);
+  });
+
+  it('returns the correct result for eq', () => {
+    expect(instance.eq(0, 1)).toBeFalsy();
+    expect(instance.eq(1, 1)).toBeTruthy();
+    expect(instance.eq(1, 0)).toBeFalsy();
   });
 });

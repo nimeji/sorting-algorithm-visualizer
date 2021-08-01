@@ -14,7 +14,7 @@ function* BubbleSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgo
     for(j = 0; j < length - 1 - i; j++) {
       yield [j, j+1];
 
-      if(!array.compare(j, j+1)) {
+      if(array.gt(j, j+1)) {
         array.swap(j, j+1);
       }
     }
@@ -39,7 +39,7 @@ function* CocktailShakerSort(array: SorterArray, indicesSorted: Set<number>): So
     swapped = false;
     for(let i = lower; i < upper; i++) {
       yield [i, i+1];
-      if(!array.compare(i, i+1)) {
+      if(array.gt(i, i+1)) {
         array.swap(i, i+1);
         swapped = true;
       }
@@ -54,7 +54,7 @@ function* CocktailShakerSort(array: SorterArray, indicesSorted: Set<number>): So
     swapped = false;
     for(let i = upper; i > lower; i--) {
       yield [i-1, i];
-      if(!array.compare(i-1, i)) {
+      if(array.gt(i-1, i)) {
         array.swap(i-1, i);
         swapped = true;
       }
@@ -81,7 +81,7 @@ function* SelectionSort(array: SorterArray, indicesSorted: Set<number>): SorterA
     let best = i;
     for(let j = i + 1; j < length; j++) {
       yield [best, j];
-      if(!array.compare(best, j)) {
+      if(array.gt(best, j)) {
         best = j;
       }
     }
@@ -107,7 +107,7 @@ function* InsertionSort(array: SorterArray, indicesSorted: Set<number>): SorterA
     indicesSorted.add(i);
     for(let j = i - 1; j >= 0; j--) {
       yield [j, j+1];
-      if(!array.compare(j, j+1)) {
+      if(array.gt(j, j+1)) {
         array.swap(j, j+1);
       } else {
         break;
@@ -122,7 +122,7 @@ function* InsertionSort(array: SorterArray, indicesSorted: Set<number>): SorterA
 
 function* QuickSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
-
+  console.log(array);
   if(length <= 0) return;
 
   function* qs(lo: number, hi: number): SorterAlgorithmGenerator {
@@ -135,11 +135,11 @@ function* QuickSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgor
         do {
           i = i + 1;
           yield [i, mid];
-        } while(array.compare(i, mid))
+        } while(array.lt(i, mid))
         do {
           j = j - 1;
           yield [mid, j];
-        } while(array.compare(mid, j))
+        } while(array.gt(j, mid))
         if(i >= j) {
           break
         }
@@ -176,11 +176,11 @@ function* HeapSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgori
     while((child = 2 * root + 1) <= end) {
       let swap = root;
       yield [swap, child];
-      if(array.compare(swap, child)) {
+      if(array.lt(swap, child)) {
         swap = child;
       }
       yield [swap, child+1];
-      if(child+1 <= end && array.compare(swap, child + 1)) {
+      if(child+1 <= end && array.lt(swap, child + 1)) {
         swap = child + 1;
       }
       if(swap === root) {
@@ -221,7 +221,7 @@ function* ShellSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgor
     for(let i = gap; i < length; i++) {
       for(let j = i; j >= gap; j -= gap) {
         yield [j - gap, j];
-        if(!array.compare(j - gap, j)) {
+        if(array.gt(j - gap, j)) {
           array.swap(j - gap, j);
         } else {
           break;
@@ -258,7 +258,7 @@ function* CombSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgori
 
     for(let i = 0; i + gap < length; i++) {
       yield [i, i + gap];
-      if(!array.compare(i, i + gap)) {
+      if(array.gt(i, i + gap)) {
         array.swap(i, i + gap);
         isSorted = false;
       }

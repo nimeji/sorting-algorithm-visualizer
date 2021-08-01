@@ -24,7 +24,7 @@ describe('SorterLogic', () => {
   });
 
   it('has a valid compareFn', () => {
-    expect(typeof SorterLogic.compareFn(1, 2)).toBe('boolean');
+    expect(typeof SorterLogic.compareFn(1, 2)).toBe('number');
   });
 
   describe('after initialization', () => {
