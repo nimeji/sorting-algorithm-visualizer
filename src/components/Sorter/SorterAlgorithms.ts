@@ -122,7 +122,7 @@ function* InsertionSort(array: SorterArray, indicesSorted: Set<number>): SorterA
 
 function* QuickSort(array: SorterArray, indicesSorted: Set<number>): SorterAlgorithmGenerator {
   const length = array.length;
-  console.log(array);
+
   if(length <= 0) return;
 
   function* qs(lo: number, hi: number): SorterAlgorithmGenerator {
