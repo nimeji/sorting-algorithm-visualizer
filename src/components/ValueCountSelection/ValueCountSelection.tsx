@@ -1,3 +1,5 @@
+import { LabeledSelect } from "../LabeledSelect/LabeledSelect";
+
 type ValueCountSelectionProps = {
   valueCount: number,
   maxValue: number,
@@ -13,7 +15,7 @@ export function ValueCountSelection({valueCount, maxValue, onChange}: ValueCount
   values.push(maxValue);
 
   return (
-    <select value={valueCount} onChange={(event) => {
+    <LabeledSelect text="Values" value={valueCount} onChange={(event) => {
       const value = parseInt(event.target.value);
 
       if(!isNaN(value) && onChange) {
@@ -21,6 +23,6 @@ export function ValueCountSelection({valueCount, maxValue, onChange}: ValueCount
       }
     }}>
       {values.map(value => <option key={value} value={value}>{value}</option>)}
-    </select>
+    </LabeledSelect>
   );
 }

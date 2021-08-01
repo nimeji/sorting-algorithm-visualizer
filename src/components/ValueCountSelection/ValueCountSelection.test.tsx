@@ -1,4 +1,6 @@
 import { shallow, ShallowWrapper } from "enzyme";
+import React from "react";
+import { LabeledSelect } from "../LabeledSelect/LabeledSelect";
 import { ValueCountSelection } from "./ValueCountSelection";
 
 const maxValue = 1234;
@@ -11,18 +13,20 @@ values.push(maxValue);
 
 describe('ValueCountSelection', () => {
   let wrapper: ShallowWrapper;
-  const onChange = jest.fn();
+  const callback = jest.fn();
+  let onChange: React.ChangeEventHandler<HTMLSelectElement>;
 
   beforeEach(() => {
-    wrapper = shallow(<ValueCountSelection valueCount={32} maxValue={maxValue} onChange={onChange} />)
+    wrapper = shallow(<ValueCountSelection valueCount={32} maxValue={maxValue} onChange={callback} />)
+    onChange = wrapper.find(LabeledSelect).props().onChange!;
   });
 
-  it('renders the select element', () => {
-    expect(wrapper.find('select')).toHaveLength(1);
+  it('renders the LabeledSelect element', () => {
+    expect(wrapper.find(LabeledSelect)).toHaveLength(1);
   });
 
   it('renders all options correctly', () => {
-    const options = wrapper.find('option');
+    const options = wrapper.find(LabeledSelect).children();
 
     options.forEach((option, i) => {
       expect(option.text()).toBe(values[i].toString());
@@ -30,25 +34,25 @@ describe('ValueCountSelection', () => {
     });
   });
 
-  it('displays the correct count as selected', () => {
+  it('passes the valueCount property to LabeledSelect', () => {
     values.forEach(value => {
       wrapper.setProps({valueCount: value});
 
-      expect(wrapper.find('select').props().value).toBe(value);
+      expect(wrapper.find(LabeledSelect).props().value).toBe(value);
     });
   });
 
-  it('calls onChange with the correct value', () => {
+  it('calls onChange callback with the correct value', () => {
     values.forEach(value => {
-      wrapper.find('select').simulate('change', {target: {value: value.toString()}});
+      onChange({target: {value: value.toString()}} as React.ChangeEvent<HTMLSelectElement>);
 
-      expect(onChange).toHaveBeenCalledWith(value);
+      expect(callback).toHaveBeenCalledWith(value);
     });
   });
 
-  it('does not call onChange with strings', () => {
-    wrapper.find('select').simulate('change', {target: {value: 'abc'}});
+  it('does not call onChange callback with strings', () => {
+    onChange({target: {value: 'abc'}} as React.ChangeEvent<HTMLSelectElement>);
 
-    expect(onChange).not.toHaveBeenCalled();
-  })
+    expect(callback).not.toHaveBeenCalled();
+  });
 });
