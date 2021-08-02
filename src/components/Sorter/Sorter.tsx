@@ -140,7 +140,7 @@ export class Sorter extends Component<SorterProps, SorterState> {
       const offset = (width - elementWidth * values.length) / 2;
 
       ctx.fillStyle = 'white';
-      ctx.fillRect(offset-borderWidth, borderWidth, innerWidth, innerHeight);
+      ctx.fillRect(offset - borderWidth * 0.5, borderWidth * 0.5, (width - 2 * offset + borderWidth), innerHeight + borderWidth);
 
       values.forEach((value, i) => {
         let color = defaultColor;
