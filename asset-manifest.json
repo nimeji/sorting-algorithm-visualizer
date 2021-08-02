@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/sav/static/css/main.45e3ac6e.chunk.css",
-    "main.js": "/sav/static/js/main.74e07913.chunk.js",
-    "main.js.map": "/sav/static/js/main.74e07913.chunk.js.map",
-    "runtime-main.js": "/sav/static/js/runtime-main.a63d5b7d.js",
-    "runtime-main.js.map": "/sav/static/js/runtime-main.a63d5b7d.js.map",
-    "static/js/2.aed8cbb5.chunk.js": "/sav/static/js/2.aed8cbb5.chunk.js",
-    "static/js/2.aed8cbb5.chunk.js.map": "/sav/static/js/2.aed8cbb5.chunk.js.map",
-    "static/js/3.b359c18e.chunk.js": "/sav/static/js/3.b359c18e.chunk.js",
-    "static/js/3.b359c18e.chunk.js.map": "/sav/static/js/3.b359c18e.chunk.js.map",
-    "index.html": "/sav/index.html",
-    "static/css/main.45e3ac6e.chunk.css.map": "/sav/static/css/main.45e3ac6e.chunk.css.map",
-    "static/js/2.aed8cbb5.chunk.js.LICENSE.txt": "/sav/static/js/2.aed8cbb5.chunk.js.LICENSE.txt",
-    "static/media/index.scss": "/sav/static/media/bootstrap-icons.dfd0ea12.woff2"
+    "main.css": "//nimeji.github.io/sorting-algorithm-visualizer/static/css/main.a63cd905.chunk.css",
+    "main.js": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/main.74e07913.chunk.js",
+    "main.js.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/main.74e07913.chunk.js.map",
+    "runtime-main.js": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/runtime-main.5011613c.js",
+    "runtime-main.js.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/runtime-main.5011613c.js.map",
+    "static/js/2.aed8cbb5.chunk.js": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/2.aed8cbb5.chunk.js",
+    "static/js/2.aed8cbb5.chunk.js.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/2.aed8cbb5.chunk.js.map",
+    "static/js/3.b359c18e.chunk.js": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/3.b359c18e.chunk.js",
+    "static/js/3.b359c18e.chunk.js.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/3.b359c18e.chunk.js.map",
+    "index.html": "//nimeji.github.io/sorting-algorithm-visualizer/index.html",
+    "static/css/main.a63cd905.chunk.css.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/css/main.a63cd905.chunk.css.map",
+    "static/js/2.aed8cbb5.chunk.js.LICENSE.txt": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/2.aed8cbb5.chunk.js.LICENSE.txt",
+    "static/media/index.scss": "//nimeji.github.io/sorting-algorithm-visualizer/static/media/bootstrap-icons.dfd0ea12.woff2"
   },
   "entrypoints": [
-    "static/js/runtime-main.a63d5b7d.js",
+    "static/js/runtime-main.5011613c.js",
     "static/js/2.aed8cbb5.chunk.js",
-    "static/css/main.45e3ac6e.chunk.css",
+    "static/css/main.a63cd905.chunk.css",
     "static/js/main.74e07913.chunk.js"
   ]
 }
