@@ -41,7 +41,7 @@ describe('DataPresetSelection', () => {
   });
 
   it('should not fail without a callback', () => {
-    wrapper.setProps({onChange: undefined});
+    wrapper.setProps({onPresetChange: undefined, onDataChange: undefined});
     onChange = wrapper.find(LabeledSelect).props().onChange!;
     expect(() => onChange({target: {value: 'shuffled'}} as React.ChangeEvent<HTMLSelectElement>)).not.toThrow();
   });
