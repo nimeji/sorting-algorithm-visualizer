@@ -15,7 +15,7 @@ describe('LabeledSelect', () => {
 
   it('renders the correct text', () => {
     wrapper.setProps({text: 'abc'});
-    expect(wrapper.find('span').text()).toBe('abc');
+    expect(wrapper.find('label').text()).toBe('abc');
   });
 
   it('renders the select element', () => {
