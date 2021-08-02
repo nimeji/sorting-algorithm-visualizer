@@ -22,21 +22,18 @@ export function LabeledSelect({text, value, onChange, disabled=false, children}:
 
   const [id] = useState(getId());
 
-  const label = text ? <Col xs="6"><label htmlFor={`LabeledSelect-${id}`} className="form-label col-form-label">{text}</label></Col> : undefined;
-
   return (
     <Container>
       <Row>
-        <Col xs="6" md="auto">
+        <Col xs="6" lg="auto">
           <label htmlFor={`LabeledSelect-${id}`} className="form-label col-form-label">{text}</label>
         </Col>
-        <Col xs="6" md="auto">
+        <Col xs="6" lg="auto">
           <select id={`LabeledSelect-${id}`} className="form-select" value={value} onChange={onChange} disabled={disabled}>
             {children}
           </select>
         </Col>
       </Row>
     </Container>
-
   );
 }
