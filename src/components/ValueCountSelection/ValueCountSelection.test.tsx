@@ -67,4 +67,11 @@ describe('ValueCountSelection', () => {
     wrapper.setProps({maxValue: 200});
     expect(callback).toHaveBeenCalledWith(128);
   });
+
+  it('throws no error without a callback', () => {
+    wrapper.setProps({maxValue: 100, valueCount: 100, onChange: undefined});
+    wrapper.setProps({maxValue: 90});
+
+    expect(callback).not.toHaveBeenCalled();
+  });
 });
