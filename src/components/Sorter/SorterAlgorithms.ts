@@ -292,3 +292,5 @@ export const algorithms = {
 }
 
 export type AlgorithmName = keyof typeof algorithms;
+
+export const algorithmNames = Object.keys(algorithms) as AlgorithmName[];
