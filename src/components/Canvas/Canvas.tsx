@@ -5,41 +5,34 @@ import { useResizeObserver } from '../../hooks/useResizeObserver';
 
 type CanvasProps = {
   draw: (ctx: CanvasRenderingContext2D, frameTime: number, avgFrameTime: number, frameCount: number) => void;
-  setup?: (ctx: CanvasRenderingContext2D) => void;
   redraw?: () => boolean;
 }
 
-export function Canvas ({draw, setup, redraw=()=>true}: CanvasProps) {
+export function Canvas ({draw, redraw=()=>true}: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const frameTime = useRef(1000);
   const frameCount = useRef(0);
   const lastFrameTime = useRef(0);
 
-  const canvasDimensions = useResizeObserver(canvasRef);
+  const wrapperDimensions = useResizeObserver(wrapperRef);
 
   useEffect(() => {
-    const context = canvasRef.current?.getContext('2d');
-    if(context) {
-      context.canvas.width = canvasDimensions?.width || 0
-      context.canvas.height = canvasDimensions?.height || 0;
+    const canvas = canvasRef.current
+    if(canvas) {
+      canvas.width = wrapperDimensions?.width || 0
+      canvas.height = wrapperDimensions?.height || 0;
 
-      if (setup) {
-        setup(context);
-      }
-
-      draw(context, frameTime.current, frameTime.current, frameCount.current);
+      const context = canvas.getContext('2d');
+      if(context) draw(context, frameTime.current, frameTime.current, frameCount.current);
     }
-  }, [canvasDimensions, setup, draw]);
+  }, [wrapperDimensions, draw]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if(!context) return;
 
-    if(setup) {
-      setup(context);
-    }
-    
     let t0 = performance.now();
 
     let animationFrameId: number;
@@ -61,7 +54,11 @@ export function Canvas ({draw, setup, redraw=()=>true}: CanvasProps) {
     return () => {
       window.cancelAnimationFrame(animationFrameId);
     }
-  }, [redraw, draw, setup]);
+  }, [redraw, draw]);
 
-  return <canvas ref={canvasRef} className={styles.canvas} />
+  return (
+    <div ref={wrapperRef} className={styles.canvasWrapper}>
+      <canvas ref={canvasRef} className={styles.canvas} />
+    </div>
+  );
 }
