@@ -19,8 +19,8 @@ describe('WindowNumberSelect', () => {
     const options = wrapper.find(LabeledSelect).find('option');
 
     options.forEach((option, i) => {
-      expect(option.props().value).toBe(i);
-      expect(option.text()).toBe(i.toString());
+      expect(option.props().value).toBe(i+1);
+      expect(option.text()).toBe((i+1).toString());
     });
   });
 
