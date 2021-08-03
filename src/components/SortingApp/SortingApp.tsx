@@ -16,6 +16,8 @@ export function SortingApp() {
   const [maxValues, setMaxValues] = useState(valueCount);
   const [algorithm, setAlgorithm] = useState<AlgorithmName>('BubbleSort');
 
+  const [enableStart, setEnableStart] = useState(true);
+  const [enablePause, setEnablePause] = useState(false);
 
   const sorterRef = useRef<Sorter>(null);
 
@@ -24,7 +26,7 @@ export function SortingApp() {
       <Navbar collapseOnSelect expand="xl" className="navbar-dark bg-secondary">
         <Container fluid>
           <Navbar.Toggle />
-          <Navbar.Brand>S-A-V</Navbar.Brand>
+          <Navbar.Brand>SAV</Navbar.Brand>
           <Navbar.Collapse>
             <Nav className="w-100 justify-content-center">
               <Nav.Item>
@@ -51,26 +53,42 @@ export function SortingApp() {
             algorithm={algorithm} 
             sleepTime={sleepTime} 
             onMaxValuesChange={setMaxValues} 
+            onFinished={() => {
+              setEnableStart(false);
+              setEnablePause(false);
+            }}
         />
       </Container>
 
-      <Nav className="navbar-dark bg-secondary py-2">
-        <Container>
+      <Nav className={`navbar-dark bg-secondary py-2 ${styles.footer}`}>
           <button 
             className="btn btn-success"
-            onClick={()=>sorterRef.current?.start()}
+            onClick={()=>{
+              sorterRef.current?.start()
+              setEnableStart(false);
+              setEnablePause(true);
+            }}
+            disabled={!enableStart}
           ><span className="bi bi-play-fill" /> Start</button>
 
           <button 
             className="btn btn-primary" 
-            onClick={()=>sorterRef.current?.pause()}
+            onClick={()=>{
+              sorterRef.current?.pause()
+              setEnableStart(true);
+              setEnablePause(false);
+            }}
+            disabled={!enablePause}
           ><span className="bi bi-pause-fill" /> Pause</button>
 
           <button 
             className="btn btn-danger"
-            onClick={()=>sorterRef.current?.reset()}
+            onClick={()=>{
+              sorterRef.current?.reset()
+              setEnableStart(true);
+              setEnablePause(false);
+            }}
           ><span className="bi bi-arrow-counterclockwise" /> Reset</button>
-        </Container>
       </Nav>
     </div>
   );
