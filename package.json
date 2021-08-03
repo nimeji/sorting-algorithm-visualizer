@@ -1,5 +1,6 @@
 {
   "name": "sorting",
+  "homepage": "https://https://nimeji.github.io/sorting-algorithm-visualizer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -22,6 +23,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -d build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -49,6 +52,7 @@
     "@types/enzyme-adapter-react-16": "^1.0.6",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.3",
     "enzyme": "^3.11.0",
+    "gh-pages": "^3.2.3",
     "react-test-renderer": "^17.0.2"
   }
 }
