@@ -70,7 +70,7 @@ export function SortingApp() {
               setEnablePause(true);
             }}
             disabled={!enableStart}
-          ><span className="bi bi-play-fill" /> Start</button>
+          ><span className="bi bi-play-fill" />Start</button>
 
           <button 
             id="btn-pause"
@@ -81,7 +81,7 @@ export function SortingApp() {
               setEnablePause(false);
             }}
             disabled={!enablePause}
-          ><span className="bi bi-pause-fill" /> Pause</button>
+          ><span className="bi bi-pause-fill" />Pause</button>
 
           <button 
             id="btn-reset"
@@ -91,7 +91,7 @@ export function SortingApp() {
               setEnableStart(true);
               setEnablePause(false);
             }}
-          ><span className="bi bi-arrow-counterclockwise" /> Reset</button>
+          ><span className="bi bi-arrow-counterclockwise" />Reset</button>
       </Nav>
     </div>
   );
