@@ -1,5 +1,6 @@
 import { shallow, ShallowWrapper } from "enzyme"
 import React from "react";
+import { LabeledSelect } from "../LabeledSelect/LabeledSelect";
 import { algorithms } from "../Sorter/SorterAlgorithms";
 import { AlgorithmSelection } from "./AlgorithmSelection"
 
@@ -12,19 +13,26 @@ describe('AlgorithmSelection', () => {
 
   beforeEach(() => {
     wrapper = shallow(<AlgorithmSelection algorithm="BubbleSort" onChange={callback} />)
-    onChange = wrapper.find('select').props().onChange!;
+    onChange = wrapper.find(LabeledSelect).props().onChange!;
   });
 
-  it('renders the select element', () => {
-    expect(wrapper.find('select')).toHaveLength(1);
+  it('renders the LabeledSelect element', () => {
+    expect(wrapper.find(LabeledSelect)).toHaveLength(1);
   });
 
   it('renders all options correctly', () => {
-    const options = wrapper.find('select').children();
+    const options = wrapper.find(LabeledSelect).children();
 
     options.forEach((option, i) => {
       expect(option.text()).toBe(algorithmNames[i]);
       expect(option.props().value).toBe(algorithmNames[i]);
+    });
+  });
+
+  it('passes the algorithm to LabeledSelect', () => {
+    algorithmNames.forEach(name => {
+      wrapper.setProps({algorithm: name});
+      expect(wrapper.find(LabeledSelect).props().value).toBe(name);
     });
   });
 
