@@ -25,10 +25,10 @@ export function LabeledSelect({text, value, onChange, disabled=false, children}:
   return (
     <Container>
       <Row>
-        <Col xs="6" lg="auto">
+        <Col xs="6" xl="auto">
           <label htmlFor={`LabeledSelect-${id}`} className="form-label col-form-label">{text}</label>
         </Col>
-        <Col xs="6" lg="auto">
+        <Col xs="6" xl="auto">
           <select id={`LabeledSelect-${id}`} className="form-select" value={value} onChange={onChange} disabled={disabled}>
             {children}
           </select>
