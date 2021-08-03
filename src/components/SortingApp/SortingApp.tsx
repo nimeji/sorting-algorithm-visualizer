@@ -61,7 +61,8 @@ export function SortingApp() {
       </Container>
 
       <Nav className={`navbar-dark bg-secondary py-2 ${styles.footer}`}>
-          <button 
+          <button
+            id="btn-start"
             className="btn btn-success"
             onClick={()=>{
               sorterRef.current?.start()
@@ -72,6 +73,7 @@ export function SortingApp() {
           ><span className="bi bi-play-fill" /> Start</button>
 
           <button 
+            id="btn-pause"
             className="btn btn-primary" 
             onClick={()=>{
               sorterRef.current?.pause()
@@ -82,6 +84,7 @@ export function SortingApp() {
           ><span className="bi bi-pause-fill" /> Pause</button>
 
           <button 
+            id="btn-reset"
             className="btn btn-danger"
             onClick={()=>{
               sorterRef.current?.reset()
