@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "//nimeji.github.io/sorting-algorithm-visualizer/static/css/main.a63cd905.chunk.css",
-    "main.js": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/main.74e07913.chunk.js",
-    "main.js.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/main.74e07913.chunk.js.map",
-    "runtime-main.js": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/runtime-main.5011613c.js",
-    "runtime-main.js.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/runtime-main.5011613c.js.map",
-    "static/js/2.aed8cbb5.chunk.js": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/2.aed8cbb5.chunk.js",
-    "static/js/2.aed8cbb5.chunk.js.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/2.aed8cbb5.chunk.js.map",
-    "static/js/3.b359c18e.chunk.js": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/3.b359c18e.chunk.js",
-    "static/js/3.b359c18e.chunk.js.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/3.b359c18e.chunk.js.map",
-    "index.html": "//nimeji.github.io/sorting-algorithm-visualizer/index.html",
-    "static/css/main.a63cd905.chunk.css.map": "//nimeji.github.io/sorting-algorithm-visualizer/static/css/main.a63cd905.chunk.css.map",
-    "static/js/2.aed8cbb5.chunk.js.LICENSE.txt": "//nimeji.github.io/sorting-algorithm-visualizer/static/js/2.aed8cbb5.chunk.js.LICENSE.txt",
-    "static/media/index.scss": "//nimeji.github.io/sorting-algorithm-visualizer/static/media/bootstrap-icons.dfd0ea12.woff2"
+    "main.css": "./static/css/main.e4883120.chunk.css",
+    "main.js": "./static/js/main.a9aa3baf.chunk.js",
+    "main.js.map": "./static/js/main.a9aa3baf.chunk.js.map",
+    "runtime-main.js": "./static/js/runtime-main.53a22002.js",
+    "runtime-main.js.map": "./static/js/runtime-main.53a22002.js.map",
+    "static/js/2.b35f7399.chunk.js": "./static/js/2.b35f7399.chunk.js",
+    "static/js/2.b35f7399.chunk.js.map": "./static/js/2.b35f7399.chunk.js.map",
+    "static/js/3.bbb7934d.chunk.js": "./static/js/3.bbb7934d.chunk.js",
+    "static/js/3.bbb7934d.chunk.js.map": "./static/js/3.bbb7934d.chunk.js.map",
+    "index.html": "./index.html",
+    "static/css/main.e4883120.chunk.css.map": "./static/css/main.e4883120.chunk.css.map",
+    "static/js/2.b35f7399.chunk.js.LICENSE.txt": "./static/js/2.b35f7399.chunk.js.LICENSE.txt",
+    "static/media/index.scss": "./static/media/bootstrap-icons.dfd0ea12.woff2"
   },
   "entrypoints": [
-    "static/js/runtime-main.5011613c.js",
-    "static/js/2.aed8cbb5.chunk.js",
-    "static/css/main.a63cd905.chunk.css",
-    "static/js/main.74e07913.chunk.js"
+    "static/js/runtime-main.53a22002.js",
+    "static/js/2.b35f7399.chunk.js",
+    "static/css/main.e4883120.chunk.css",
+    "static/js/main.a9aa3baf.chunk.js"
   ]
 }
